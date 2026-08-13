@@ -22,7 +22,7 @@ xcodegen generate \
   --spec "$PROJECT_SPEC" \
   --project "$PROJECT_GENERATION_DIR" \
   --project-root "$PROJECT_DIR"
-ln -s "$PROJECT_DIR/Config" "$PROJECT_GENERATION_DIR/Config"
+ln -s "$PROJECT_DIR/FreeApp" "$PROJECT_GENERATION_DIR/FreeApp"
 
 xcodebuild \
   -project "$PROJECT_GENERATION_DIR/WindsifyFree.xcodeproj" \

@@ -28,7 +28,7 @@ targets:
         excludes:
           - "**/* 2.png"
     info:
-      path: Config/Info.plist
+      path: FreeApp/Info.plist
       properties:
         CFBundleDisplayName: Windsify Free
         CFBundleShortVersionString: "$(MARKETING_VERSION)"
