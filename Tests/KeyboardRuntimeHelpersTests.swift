@@ -248,6 +248,69 @@ final class KeyboardRuntimeHelpersTests: XCTestCase {
         }
     }
 
+    func testRightShiftSelectionSequenceUsesTheSameNativeFastPath() throws {
+        var contextQueryCount = 0
+        let controller = CGEventTapController(
+            contextProvider: {
+                contextQueryCount += 1
+                return MappingContext(isTextInput: true)
+            }
+        )
+        let source = CGEventSource(stateID: .privateState)!
+
+        XCTAssertTrue(
+            controller.passesThroughBeforeContext(
+                KeyboardStroke(
+                    keyCode: MacKeyCode.rightShift,
+                    phase: .flagsChanged,
+                    modifiers: [.shift]
+                )
+            )
+        )
+
+        for keyCode in [MacKeyCode.leftArrow, MacKeyCode.rightArrow] {
+            for phase in [KeyPhase.down, .up] {
+                let event = CGEvent(
+                    keyboardEventSource: source,
+                    virtualKey: CGKeyCode(keyCode),
+                    keyDown: phase == .down
+                )!
+                event.flags = [
+                    .maskNumericPad,
+                    .maskSecondaryFn,
+                    .maskShift,
+                ]
+                let stroke = try XCTUnwrap(
+                    CGEventTapController.keyboardStroke(
+                        from: event,
+                        type: phase == .down ? .keyDown : .keyUp
+                    )
+                )
+
+                XCTAssertEqual(stroke.modifiers, [.shift])
+                XCTAssertTrue(controller.passesThroughBeforeContext(stroke))
+                XCTAssertTrue(
+                    CGEventTapController.normalizeNativeShiftSelectionEvent(
+                        event,
+                        stroke: stroke
+                    )
+                )
+                XCTAssertTrue(event.flags.contains(.maskShift))
+                XCTAssertFalse(event.flags.contains(.maskSecondaryFn))
+            }
+        }
+
+        XCTAssertTrue(
+            controller.passesThroughBeforeContext(
+                KeyboardStroke(
+                    keyCode: MacKeyCode.rightShift,
+                    phase: .flagsChanged
+                )
+            )
+        )
+        XCTAssertEqual(contextQueryCount, 0)
+    }
+
     func testNativeShiftSelectionDoesNotNormalizeOtherShortcuts() {
         let source = CGEventSource(stateID: .privateState)!
         let cases = [

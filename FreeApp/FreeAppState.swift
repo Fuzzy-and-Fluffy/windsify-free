@@ -21,6 +21,7 @@ final class FreeAppState: ObservableObject {
     @Published private(set) var lastErrorMessage: String?
 
     private let keyboardController: CGEventTapController
+    private let applicationMenuKeyController: ApplicationMenuKeyController
     private let accessibilityAuthorizer: any AccessibilityAuthorizing
     private let conflictDiagnostics: any ConflictDiagnosing
     private let launchAtLoginManager: any LaunchAtLoginManaging
@@ -42,6 +43,7 @@ final class FreeAppState: ObservableObject {
         self.defaults = defaults
         keyboardController = CGEventTapController()
         keyboardController.windowActionsEnabled = false
+        applicationMenuKeyController = ApplicationMenuKeyController()
 
         keyboardTranslationEnabled = defaults.object(
             forKey: PreferenceKey.keyboardTranslationEnabled
@@ -115,18 +117,20 @@ final class FreeAppState: ObservableObject {
             && !keyboardIsBlockedByConflicts
 
         guard shouldRun else {
+            applicationMenuKeyController.stop()
             keyboardController.stop()
             keyboardEngineIsRunning = false
             return
         }
 
-        guard !keyboardController.isRunning else {
-            keyboardEngineIsRunning = true
-            return
-        }
-
         do {
-            try keyboardController.start()
+            if !keyboardController.isRunning {
+                try keyboardController.start()
+            }
+            // The ordinary event tap remains the engine's required owner.
+            // Menu-key HID support is best-effort and must not disable Free
+            // shortcuts if Input Monitoring is unavailable.
+            try? applicationMenuKeyController.start()
             keyboardEngineIsRunning = true
             lastErrorMessage = nil
         } catch {
