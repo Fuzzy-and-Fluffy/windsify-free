@@ -13,6 +13,7 @@ Included behavior:
 - Alt+Tab, Alt+Shift+Tab, Alt+F4 and Ctrl+F4;
 - Ctrl+Insert and Shift+Insert;
 - Win+Space input-source switching;
+- the Windows Application/Menu key opens the focused contextual menu;
 - native Ctrl+Space, Ctrl+Tab, Shift+Arrow selection, secure input, remote
   desktop input, and Terminal Ctrl sequences including Ctrl+C.
 
@@ -20,9 +21,11 @@ Windsify Free does not include Finder automation, screenshot and system
 shortcuts, Windows Terminal app actions, window management, drag-to-edge
 snapping, multi-display layouts, licensing, or other Windsify Pro features.
 
-The app processes key metadata locally through one macOS event tap. It does
-not record typed text, use a kernel or DriverKit extension, or transmit key
-events.
+The app processes key metadata locally through one macOS event tap. Because
+macOS does not expose the standard Windows Menu key through that event tap, a
+non-seizing HID listener additionally accepts only its standard `0x65` usage.
+The app does not record typed text, use a kernel or DriverKit extension, or
+transmit key events.
 
 ## Build and test
 
@@ -43,9 +46,10 @@ xcodebuild -project WindsifyFree.xcodeproj \
   CODE_SIGNING_ALLOWED=NO test
 ```
 
-The first run requires macOS Accessibility permission. Review the source and
-build it yourself, or visit [windsify.com](https://windsify.com) for official
-build availability and Windsify Pro information.
+The first run requires macOS Accessibility permission. Menu-key support may
+also require Input Monitoring permission. Review the source and build it
+yourself, or visit [windsify.com](https://windsify.com) for official build
+availability and Windsify Pro information.
 
 ## License
 
