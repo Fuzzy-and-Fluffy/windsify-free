@@ -50,6 +50,7 @@ struct FreeSettingsView: View {
                 shortcut("Alt+Tab", "Switch applications")
                 shortcut("Alt+F4", "Close the active window")
                 shortcut("Win+Space", "Switch input source")
+                shortcut("Application / Menu", "Open contextual menu")
 
                 Text(
                     "Ctrl+Space, Ctrl+Tab, Terminal Ctrl shortcuts, remote "

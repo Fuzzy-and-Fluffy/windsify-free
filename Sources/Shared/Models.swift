@@ -47,6 +47,13 @@ struct MappingContext: Equatable, Sendable {
 }
 
 enum WindowCommand: String, Equatable, Sendable {
+    // Stateful Windows directions are intentionally distinct from the fixed
+    // Rectangle-compatible placements below. Their result depends on the
+    // focused window's current snapped state.
+    case windowsLeft
+    case windowsRight
+    case windowsUp
+    case windowsDown
     case leftHalf
     case rightHalf
     case fill
