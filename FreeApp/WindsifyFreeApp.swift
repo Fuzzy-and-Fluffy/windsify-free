@@ -91,6 +91,10 @@ private struct FreeMenuBarView: View {
         ) { _ in
             openSettings()
         }
+
+        Text(AppVersionPresentation(bundle: .main).freeAppText)
+            .foregroundStyle(.secondary)
+            .disabled(true)
     }
 
     private func openSettings() {
