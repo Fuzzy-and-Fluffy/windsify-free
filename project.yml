@@ -21,6 +21,7 @@ targets:
       - FreeApp
       - Sources/Keyboard
       - Sources/Shared/Models.swift
+      - Sources/Shared/AppVersionPresentation.swift
       - Sources/Diagnostics/ConflictDiagnostics.swift
       - Sources/App/AccessibilityAuthorization.swift
       - Sources/App/LaunchAtLogin.swift

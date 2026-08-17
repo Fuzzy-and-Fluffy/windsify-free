@@ -93,6 +93,13 @@ struct FreeSettingsView: View {
                     destination: URL(string: "https://windsify.com")!
                 )
             }
+
+            Section {
+                Text(AppVersionPresentation(bundle: .main).freeAppText)
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+            }
         }
         .formStyle(.grouped)
         .frame(minWidth: 620, minHeight: 540)
