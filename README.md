@@ -4,6 +4,15 @@ Windsify Free is the open-source Windows keyboard compatibility layer for
 macOS. It provides familiar editing and app-switching shortcuts without
 changing macOS Modifier Keys settings and without requiring Karabiner-Elements.
 
+> **Just want it installed?** Get the signed, notarized build from
+> **[windsify.com](https://windsify.com)** — one download, drag to Applications,
+> done. The free keyboard layer below is yours forever; an optional one-time
+> **Windsify Pro** adds Finder file operations, window management, and system
+> shortcuts. Every download includes a 14-day Pro trial that falls back to Free.
+>
+> This repository is the buildable source of the free layer, for anyone who
+> wants to read or compile it themselves.
+
 Included behavior:
 
 - Ctrl+C, X, V, Z and other ordinary Ctrl app shortcuts;
