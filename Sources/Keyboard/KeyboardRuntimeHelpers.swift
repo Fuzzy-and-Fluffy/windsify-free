@@ -64,25 +64,54 @@ enum AccessibilityFocusResolver {
         focusedApplication: (Element) -> Element?,
         frontmostApplication: () -> Element?
     ) -> Resolution<Element>? {
+        resolutions(
+            systemWideElement: systemWideElement,
+            focusedElement: focusedElement,
+            focusedApplication: focusedApplication,
+            frontmostApplication: frontmostApplication
+        ).first
+    }
+
+    /// Returns every focused-element source in priority order. Some browsers
+    /// expose a generic page container from the application while the
+    /// system-wide Accessibility object exposes the actual web editor. Callers
+    /// that classify focus should inspect all candidates instead of stopping
+    /// at the first non-nil element.
+    static func resolutions<Element>(
+        systemWideElement: Element,
+        focusedElement: (Element) -> Element?,
+        focusedApplication: (Element) -> Element?,
+        frontmostApplication: () -> Element?
+    ) -> [Resolution<Element>] {
+        var results: [Resolution<Element>] = []
+
         if let application = focusedApplication(systemWideElement),
            let element = focusedElement(application) {
-            return Resolution(
-                element: element,
-                source: .keyboardFocusApplication
+            results.append(
+                Resolution(
+                    element: element,
+                    source: .keyboardFocusApplication
+                )
             )
         }
 
         if let element = focusedElement(systemWideElement) {
-            return Resolution(element: element, source: .systemWide)
+            results.append(
+                Resolution(element: element, source: .systemWide)
+            )
         }
 
-        guard let application = frontmostApplication() else {
-            return nil
+        if let application = frontmostApplication(),
+           let element = focusedElement(application) {
+            results.append(
+                Resolution(
+                    element: element,
+                    source: .frontmostApplication
+                )
+            )
         }
-        guard let element = focusedElement(application) else {
-            return nil
-        }
-        return Resolution(element: element, source: .frontmostApplication)
+
+        return results
     }
 }
 
@@ -108,6 +137,28 @@ enum AccessibilityTextInputFocusResolver {
             depth += 1
         }
         return false
+    }
+}
+
+/// Classifies every Accessibility focus source before concluding that the
+/// current control is not editable. This is important for web editors where
+/// the application-level source can be a generic AXWebArea while the
+/// system-wide source points at the actual text entry area.
+enum AccessibilityTextInputCandidateResolver {
+    static func isTextInput<Element>(
+        candidates: [Element],
+        maximumAncestorDepth: Int = 4,
+        classifiesAsTextInput: (Element) -> Bool,
+        parent: (Element) -> Element?
+    ) -> Bool {
+        candidates.contains { candidate in
+            AccessibilityTextInputFocusResolver.isTextInput(
+                startingAt: candidate,
+                maximumAncestorDepth: maximumAncestorDepth,
+                classifiesAsTextInput: classifiesAsTextInput,
+                parent: parent
+            )
+        }
     }
 }
 

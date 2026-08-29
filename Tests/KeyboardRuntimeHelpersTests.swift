@@ -887,6 +887,38 @@ final class KeyboardRuntimeHelpersTests: XCTestCase {
         )
     }
 
+    func testFocusResolverReturnsEveryAvailableCandidateInPriorityOrder() {
+        let focusedElements = [
+            "keyboard-app": "generic-web-area",
+            "system-wide": "reddit-comment-editor",
+            "frontmost-app": "frontmost-web-area",
+        ]
+
+        let resolutions = AccessibilityFocusResolver.resolutions(
+            systemWideElement: "system-wide",
+            focusedElement: { focusedElements[$0] },
+            focusedApplication: { _ in "keyboard-app" },
+            frontmostApplication: { "frontmost-app" }
+        )
+
+        XCTAssertEqual(
+            resolutions.map(\.element),
+            [
+                "generic-web-area",
+                "reddit-comment-editor",
+                "frontmost-web-area",
+            ]
+        )
+        XCTAssertEqual(
+            resolutions.map(\.source),
+            [
+                .keyboardFocusApplication,
+                .systemWide,
+                .frontmostApplication,
+            ]
+        )
+    }
+
     func testTextInputFocusResolverFindsEditableAncestor() {
         let parents = [
             "internal-field-child": "text-field",
@@ -904,6 +936,28 @@ final class KeyboardRuntimeHelpersTests: XCTestCase {
             AccessibilityTextInputFocusResolver.isTextInput(
                 startingAt: "button-child",
                 classifiesAsTextInput: { $0 == "text-field" },
+                parent: { parents[$0] }
+            )
+        )
+    }
+
+    func testTextInputCandidateResolverUsesPreciseSystemWideEditor() {
+        let parents = [
+            "reddit-editor-child": "reddit-editor",
+            "reddit-editor": "web-area",
+        ]
+
+        XCTAssertTrue(
+            AccessibilityTextInputCandidateResolver.isTextInput(
+                candidates: ["generic-web-area", "reddit-editor-child"],
+                classifiesAsTextInput: { $0 == "reddit-editor" },
+                parent: { parents[$0] }
+            )
+        )
+        XCTAssertFalse(
+            AccessibilityTextInputCandidateResolver.isTextInput(
+                candidates: ["generic-web-area", "page-container"],
+                classifiesAsTextInput: { $0 == "reddit-editor" },
                 parent: { parents[$0] }
             )
         )

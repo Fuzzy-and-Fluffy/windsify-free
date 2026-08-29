@@ -805,12 +805,13 @@ final class CGEventTapController {
     }
 
     private static func focusedElementIsTextInput() -> Bool {
-        guard let resolution = focusedUIElementResolution() else {
-            return false
-        }
+        var seenElements: Set<AXUIElement> = []
+        let candidates = focusedUIElementResolutions()
+            .map(\.element)
+            .filter { seenElements.insert($0).inserted }
 
-        return AccessibilityTextInputFocusResolver.isTextInput(
-            startingAt: resolution.element,
+        return AccessibilityTextInputCandidateResolver.isTextInput(
+            candidates: candidates,
             classifiesAsTextInput: elementIsTextInput,
             parent: { element in
                 elementAttribute(
@@ -848,8 +849,13 @@ final class CGEventTapController {
 
     private static func focusedUIElementResolution()
         -> AccessibilityFocusResolver.Resolution<AXUIElement>? {
+        focusedUIElementResolutions().first
+    }
+
+    private static func focusedUIElementResolutions()
+        -> [AccessibilityFocusResolver.Resolution<AXUIElement>] {
         let systemWideElement = AXUIElementCreateSystemWide()
-        return AccessibilityFocusResolver.resolve(
+        return AccessibilityFocusResolver.resolutions(
             systemWideElement: systemWideElement,
             focusedElement: { element in
                 elementAttribute(
