@@ -193,7 +193,8 @@ final class ShortcutSupportModel: ObservableObject {
             let vendor = IOHIDDeviceGetProperty(device, kIOHIDVendorIDKey as CFString) as? Int ?? 0
             let productID = IOHIDDeviceGetProperty(device, kIOHIDProductIDKey as CFString) as? Int ?? 0
             let transport = IOHIDDeviceGetProperty(device, kIOHIDTransportKey as CFString) as? String ?? "unknown"
-            return "\(product.prefix(100)) [vendor \(vendor), product \(productID), \(transport.prefix(30))]"
+            let functionRow = FunctionRowMetadata.summary(for: device) ?? "not available"
+            return "\(product.prefix(100)) [vendor \(vendor), product \(productID), \(transport.prefix(30))] [Advertised function row: \(functionRow)]"
         }.sorted()
         lines.append("Connected keyboards (event device not identified): \(descriptions.isEmpty ? "not available" : descriptions.joined(separator: "; "))")
         return lines

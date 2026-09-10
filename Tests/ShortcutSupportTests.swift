@@ -93,6 +93,21 @@ final class ShortcutSupportTests: XCTestCase {
         XCTAssertTrue(model.result?.sample?.modifiers.contains("function") == true)
     }
 
+    func testModernSpotlightPreviewRetainsRawInputAndConsumesRelease() {
+        let model = makeModel()
+        model.start()
+        let flags: CGEventFlags = [.maskAlternate, .maskSecondaryFn]
+        XCTAssertEqual(model.intercept(type: .keyDown, event: event(code: 177, flags: flags)), true)
+        XCTAssertEqual(model.result?.outcome, "mapping-recognized-preview-only")
+        XCTAssertEqual(model.result?.sample?.keyCode, 177)
+        XCTAssertTrue(model.result?.sample?.modifiers.contains("function") == true)
+        XCTAssertEqual(model.result?.receivedShortcut, "Option + Spotlight")
+        XCTAssertEqual(model.result?.ruleID, "generic.alt-f4")
+        XCTAssertEqual(model.result?.output, "Command + W")
+        XCTAssertEqual(model.intercept(type: .keyUp, event: event(code: 177, down: false, flags: flags)), true)
+        XCTAssertFalse(model.isListening)
+    }
+
     func testOrdinaryUnrelatedShortcutGetsActionableExplanation() {
         let model = makeModel()
         model.start()
