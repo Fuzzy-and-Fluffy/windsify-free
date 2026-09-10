@@ -2,6 +2,7 @@ import SwiftUI
 
 struct FreeSettingsView: View {
     @ObservedObject var appState: FreeAppState
+    @State private var showsShortcutHelp = false
 
     var body: some View {
         Form {
@@ -43,6 +44,7 @@ struct FreeSettingsView: View {
             }
 
             Section("Included shortcuts") {
+                Button("Shortcut Help…") { showsShortcutHelp = true }
                 shortcut("Ctrl+C / X / V / Z", "Copy, cut, paste, undo")
                 shortcut("Ctrl+Y", "Redo")
                 shortcut("Home / End", "Start or end of the line")
@@ -105,6 +107,18 @@ struct FreeSettingsView: View {
         .frame(minWidth: 620, minHeight: 540)
         .onAppear {
             appState.activate()
+        }
+        .onChange(of: appState.keyboardEngineIsRunning) { _, _ in appState.shortcutSupport.refresh() }
+        .onChange(of: appState.accessibilityStatus) { _, _ in appState.shortcutSupport.refresh() }
+        .sheet(isPresented: $showsShortcutHelp) {
+            VStack(alignment: .trailing) {
+                Button("Done") { showsShortcutHelp = false }.padding(.trailing, 16)
+                ShortcutSupportView(model: appState.shortcutSupport,
+                                    enableKeyboard: { appState.setKeyboardTranslationEnabled(true); appState.shortcutSupport.refresh() },
+                                    openAccessibility: { appState.requestAccessibilityAccess() })
+            }
+            .padding(.top, 16)
+            .frame(width: 600, height: 580)
         }
         .alert(
             "Windsify Free",

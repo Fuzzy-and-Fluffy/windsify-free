@@ -19,6 +19,7 @@ final class FreeAppState: ObservableObject {
     @Published private(set) var conflicts: [ConflictFinding] = []
     @Published private(set) var launchAtLoginEnabled: Bool
     @Published private(set) var lastErrorMessage: String?
+    let shortcutSupport = ShortcutSupportModel()
 
     private let keyboardController: CGEventTapController
     private let applicationMenuKeyController: ApplicationMenuKeyController
@@ -52,6 +53,17 @@ final class FreeAppState: ObservableObject {
             ? .granted
             : .notGranted
         launchAtLoginEnabled = launchAtLoginManager.isEnabled
+        keyboardController.shortcutTestHandler = { [weak shortcutSupport] type, event in
+            MainActor.assumeIsolated { shortcutSupport?.intercept(type: type, event: event) }
+        }
+        shortcutSupport.statusProvider = { [weak self] in
+            guard let self else { return ShortcutSupportStatus() }
+            return ShortcutSupportStatus(keyboardEnabled: self.keyboardTranslationEnabled,
+                                         keyboardRunning: self.keyboardEngineIsRunning,
+                                         accessibilityGranted: self.accessibilityStatus == .granted,
+                                         conflictIDs: self.relevantConflicts.map(\.id),
+                                         blockedByConflict: self.keyboardIsBlockedByConflicts)
+        }
     }
 
     var relevantConflicts: [ConflictFinding] {

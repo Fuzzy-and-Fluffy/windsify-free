@@ -141,6 +141,10 @@ final class CGEventTapController {
     /// pass through instead of invoking the window controller.
     var windowActionsEnabled = true
 
+    /// Explicit, short-lived support preview. nil leaves normal processing
+    /// untouched; false bypasses mapping; true consumes the test event.
+    var shortcutTestHandler: ((CGEventType, CGEvent) -> Bool?)?
+
     var isRunning: Bool {
         eventTap != nil
     }
@@ -295,6 +299,11 @@ final class CGEventTapController {
         guard event.getIntegerValueField(.eventSourceUserData)
             != Self.syntheticEventMarker else {
             return Unmanaged.passUnretained(event)
+        }
+
+        if let suppress = shortcutTestHandler?(type, event) {
+            windowsKeyTapTracker = WindowsKeyTapTracker()
+            return suppress ? nil : Unmanaged.passUnretained(event)
         }
 
         guard let stroke = Self.keyboardStroke(from: event, type: type) else {
