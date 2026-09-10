@@ -204,7 +204,9 @@ final class CGEventTapController {
         ])
 
         guard let newEventTap = CGEvent.tapCreate(
-            tap: .cgSessionEventTap,
+            // Observe Quartz keyboard events before WindowServer handles
+            // dedicated Apple action keys. This remains our single event tap.
+            tap: .cghidEventTap,
             place: .headInsertEventTap,
             options: .defaultTap,
             eventsOfInterest: eventMask,
@@ -309,10 +311,17 @@ final class CGEventTapController {
         guard let stroke = Self.keyboardStroke(from: event, type: type) else {
             return Unmanaged.passUnretained(event)
         }
+        // Policy aliases must not collapse physical identities: a standard
+        // F4 and a Spotlight action key can be held independently. Release
+        // pairing also survives releasing Option before the action key.
+        let rawKeyCode = UInt16(clamping: event.getIntegerValueField(.keyboardEventKeycode))
+        let physicalStroke = (type == .keyDown || type == .keyUp)
+            ? KeyboardStroke(keyCode: rawKeyCode, phase: stroke.phase, modifiers: stroke.modifiers)
+            : stroke
 
         if event.getIntegerValueField(.keyboardEventAutorepeat) != 0,
            let replacements = replacementTransactions
-               .autoRepeatReplacements(for: stroke) {
+               .autoRepeatReplacements(for: physicalStroke) {
             switch dispatchReplacements(
                 replacements,
                 originalEvent: event,
@@ -329,7 +338,7 @@ final class CGEventTapController {
         }
 
         if let replacements = replacementTransactions
-            .keyUpReplacements(for: stroke) {
+            .keyUpReplacements(for: physicalStroke) {
             switch dispatchReplacements(
                 replacements,
                 originalEvent: event,
@@ -338,17 +347,17 @@ final class CGEventTapController {
             ) {
             case .failed:
                 if recoverCommittedReplacement(
-                    physicalStroke: stroke,
+                    physicalStroke: physicalStroke,
                     releases: replacements
                 ) {
                     return nil
                 }
                 return Unmanaged.passUnretained(event)
             case .posted:
-                replacementTransactions.complete(physicalStroke: stroke)
+                replacementTransactions.complete(physicalStroke: physicalStroke)
                 return nil
             case .rewroteOriginal:
-                replacementTransactions.complete(physicalStroke: stroke)
+                replacementTransactions.complete(physicalStroke: physicalStroke)
                 return Unmanaged.passUnretained(event)
             }
         }
@@ -357,12 +366,12 @@ final class CGEventTapController {
            event.getIntegerValueField(.keyboardEventAutorepeat) == 0,
            let staleReleases = replacementTransactions.keyUpReplacements(
                for: KeyboardStroke(
-                   keyCode: stroke.keyCode,
+                   keyCode: physicalStroke.keyCode,
                    phase: .up
                )
            ),
            !recoverCommittedReplacement(
-               physicalStroke: stroke,
+               physicalStroke: physicalStroke,
                releases: staleReleases
            ) {
             // Do not overwrite an unreleased target or pass through a new
@@ -370,7 +379,7 @@ final class CGEventTapController {
             return nil
         }
 
-        if passesThroughBeforeContext(stroke) {
+        if passesThroughBeforeContext(stroke, originalKeyCode: (type == .keyDown || type == .keyUp) ? rawKeyCode : nil) {
             Self.normalizeNativeShiftSelectionEvent(
                 event,
                 stroke: stroke
@@ -428,13 +437,13 @@ final class CGEventTapController {
                 return Unmanaged.passUnretained(event)
             case .posted:
                 replacementTransactions.commit(
-                    physicalStroke: stroke,
+                    physicalStroke: physicalStroke,
                     replacements: replacements
                 )
                 return nil
             case .rewroteOriginal:
                 replacementTransactions.commit(
-                    physicalStroke: stroke,
+                    physicalStroke: physicalStroke,
                     replacements: replacements
                 )
                 return Unmanaged.passUnretained(event)
@@ -486,7 +495,17 @@ final class CGEventTapController {
     /// Accessibility query. Non-Command modifier changes and plain
     /// Shift+Arrow are guaranteed to leave through the tap immediately.
     func passesThroughBeforeContext(_ stroke: KeyboardStroke) -> Bool {
+        passesThroughBeforeContext(stroke, originalKeyCode: nil)
+    }
+
+    func passesThroughBeforeContext(_ stroke: KeyboardStroke, originalKeyCode: UInt16?) -> Bool {
         let shouldOpenSpotlight = windowsKeyTapTracker.observe(stroke)
+
+        if let originalKeyCode, AppleActionKey.functionKeys[originalKeyCode] != nil,
+           stroke.modifiers.isEmpty {
+            // Preserve bare Dictation even in browsers where plain F5 refreshes.
+            return true
+        }
 
         if stroke.phase == .flagsChanged {
             if shouldOpenSpotlight {
@@ -627,10 +646,18 @@ final class CGEventTapController {
             return nil
         }
 
-        let keyCode = UInt16(
+        let rawKeyCode = UInt16(
             event.getIntegerValueField(.keyboardEventKeycode)
         )
+        let actionFunctionKey = (type == .keyDown || type == .keyUp)
+            ? AppleActionKey.functionKeys[rawKeyCode] : nil
+        let keyCode = actionFunctionKey ?? rawKeyCode
         var modifiers = keyModifiers(from: event.flags)
+        if actionFunctionKey != nil {
+            // SecondaryFn marks the action-key layer; it does not mean that
+            // the user deliberately added Fn to this shortcut.
+            modifiers.remove(.function)
+        }
         if [
             MacKeyCode.home,
             MacKeyCode.end,

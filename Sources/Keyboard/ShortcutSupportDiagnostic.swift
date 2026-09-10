@@ -134,7 +134,9 @@ enum ShortcutKeyDisplay {
     static func describe(code: UInt16, modifiers: [String]) -> String {
         let labels = [("control", "Control"), ("option", "Option"),
                       ("shift", "Shift"), ("command", "Command"), ("function", "Fn")]
-        let prefix = labels.filter { modifiers.contains($0.0) }.map { $0.1 }
+        let visibleModifiers = AppleActionKey.names[code] == nil
+            ? modifiers : modifiers.filter { $0 != "function" }
+        let prefix = labels.filter { visibleModifiers.contains($0.0) }.map { $0.1 }
         let names: [UInt16: String] = [
             0: "A", 1: "S", 2: "D", 3: "F", 4: "H", 5: "G", 6: "Z", 7: "X", 8: "C", 9: "V",
             11: "B", 12: "Q", 13: "W", 14: "E", 15: "R", 16: "Y", 17: "T", 18: "1", 19: "2",
@@ -147,7 +149,7 @@ enum ShortcutKeyDisplay {
             MacKeyCode.home: "Home", MacKeyCode.end: "End", MacKeyCode.forwardDelete: "Delete",
             MacKeyCode.leftArrow: "Left", MacKeyCode.rightArrow: "Right", MacKeyCode.upArrow: "Up", MacKeyCode.downArrow: "Down"
         ]
-        return (prefix + [names[code] ?? "Unrecognized key"]).joined(separator: " + ")
+        return (prefix + [AppleActionKey.names[code] ?? names[code] ?? "Unrecognized key"]).joined(separator: " + ")
     }
 }
 

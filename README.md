@@ -33,8 +33,21 @@ snapping, multi-display layouts, licensing, or other Windsify Pro features.
 The app processes key metadata locally through one macOS event tap. Because
 macOS does not expose the standard Windows Menu key through that event tap, a
 non-seizing HID listener additionally accepts only its standard `0x65` usage.
-The app does not record typed text, use a kernel or DriverKit extension, or
-transmit key events.
+The app does not record typed text or use a kernel or DriverKit extension.
+
+## Shortcut Help
+
+Click **Shortcut Help**, then **Test shortcut**, and press the combination once.
+The app explains the result and can fill in an email draft with versions,
+keyboard information, driver-advertised function-row mappings when available,
+and that one test event. You can review the report before sending it. No report
+is sent automatically and no typed text or background key history is collected.
+
+Version 1.3.1 recognizes the dedicated Spotlight action key for Alt+F4 on
+compatible Apple keyboards, alongside standard F4 and Fn+F4. Mission Control,
+Dictation and Do Not Disturb action keys are recognized too; pressing a bare
+action key keeps its native behavior. Function-key delivery varies by keyboard
+and macOS, so Fn+Option+F4 remains the standard-function-key fallback.
 
 ## Build and test
 

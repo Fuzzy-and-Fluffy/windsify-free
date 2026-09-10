@@ -1116,8 +1116,10 @@ final class KeyboardRuntimeHelpersTests: XCTestCase {
             (Int(NX_KEYTYPE_ILLUMINATION_DOWN), MacKeyCode.f5),
             (Int(NX_KEYTYPE_ILLUMINATION_UP), MacKeyCode.f6),
             (Int(NX_KEYTYPE_PREVIOUS), MacKeyCode.f7),
+            (Int(NX_KEYTYPE_REWIND), MacKeyCode.f7),
             (Int(NX_KEYTYPE_PLAY), MacKeyCode.f8),
             (Int(NX_KEYTYPE_NEXT), MacKeyCode.f9),
+            (Int(NX_KEYTYPE_FAST), MacKeyCode.f9),
             (Int(NX_KEYTYPE_MUTE), MacKeyCode.f10),
             (Int(NX_KEYTYPE_SOUND_DOWN), MacKeyCode.f11),
             (Int(NX_KEYTYPE_SOUND_UP), MacKeyCode.f12),
@@ -1157,5 +1159,66 @@ final class KeyboardRuntimeHelpersTests: XCTestCase {
                 modifiers: []
             )
         )
+    }
+
+    func testAllStandardFunctionKeysPreserveDownUpAndFnLayer() throws {
+        let keys: [UInt16] = [122, 120, 99, 118, 96, 97, 98, 100, 101, 109, 103, 111]
+        for key in keys {
+            for fn in [false, true] {
+                for down in [false, true] {
+                    let event = try XCTUnwrap(CGEvent(keyboardEventSource: nil, virtualKey: key, keyDown: down))
+                    event.flags = fn ? [.maskAlternate, .maskSecondaryFn] : [.maskAlternate]
+                    let stroke = CGEventTapController.keyboardStroke(from: event, type: down ? .keyDown : .keyUp)
+                    XCTAssertEqual(stroke, KeyboardStroke(keyCode: key, phase: down ? .down : .up,
+                                                         modifiers: fn ? [.option, .function] : [.option]))
+                }
+            }
+        }
+    }
+
+    func testAppleActionKeysDecodeWithoutChangingOriginalEvents() throws {
+        for (raw, expected): (UInt16, UInt16) in [(0xA0, 99), (0xB0, 96), (0xB1, 118), (0xB2, 97)] {
+            for down in [false, true] {
+                let event = try XCTUnwrap(CGEvent(keyboardEventSource: nil, virtualKey: raw, keyDown: down))
+                event.flags = [.maskAlternate, .maskSecondaryFn, .maskNonCoalesced]
+                let stroke = CGEventTapController.keyboardStroke(from: event, type: down ? .keyDown : .keyUp)
+                XCTAssertEqual(stroke, KeyboardStroke(keyCode: expected, phase: down ? .down : .up, modifiers: [.option]))
+                XCTAssertEqual(event.getIntegerValueField(.keyboardEventKeycode), Int64(raw))
+                XCTAssertTrue(event.flags.contains(.maskSecondaryFn))
+            }
+        }
+    }
+
+    func testSpotlightOptionShortcutUsesCloseRuleAndNativeGuards() throws {
+        let event = try XCTUnwrap(CGEvent(keyboardEventSource: nil, virtualKey: 0xB1, keyDown: true))
+        event.flags = [.maskAlternate, .maskSecondaryFn]
+        let stroke = try XCTUnwrap(CGEventTapController.keyboardStroke(from: event, type: .keyDown))
+        let engine = KeyboardMappingEngine()
+        XCTAssertEqual(engine.evaluate(stroke).action, .replace([KeyboardStroke(keyCode: MacKeyCode.w, modifiers: [.command])]))
+        XCTAssertEqual(engine.evaluate(stroke, context: MappingContext(bundleIdentifier: "com.apple.Safari")).action,
+                       .replace([KeyboardStroke(keyCode: MacKeyCode.w, modifiers: [.command, .shift])]))
+        XCTAssertEqual(engine.evaluate(stroke, context: MappingContext(isSecureInput: true)).action, .passThrough)
+        XCTAssertEqual(engine.evaluate(stroke, context: MappingContext(bundleIdentifier: "com.microsoft.windowsapp")).action, .passThrough)
+    }
+
+    func testBareAppleActionKeysKeepNativeFunctions() throws {
+        for raw: UInt16 in [0xA0, 0xB0, 0xB1, 0xB2] {
+            let event = try XCTUnwrap(CGEvent(keyboardEventSource: nil, virtualKey: raw, keyDown: true))
+            event.flags = [.maskSecondaryFn]
+            let stroke = try XCTUnwrap(CGEventTapController.keyboardStroke(from: event, type: .keyDown))
+            XCTAssertEqual(KeyboardMappingEngine().evaluate(stroke).action, .passThrough)
+            XCTAssertEqual(event.getIntegerValueField(.keyboardEventKeycode), Int64(raw))
+        }
+    }
+
+    func testFunctionRowMetadataAcceptsDriverPackingAndExcludesOtherKeys() {
+        XCTAssertEqual(FunctionRowMetadata.sanitizedSummary("0x0007003d,0x000c0221,0x0007003e,0x000c00cf"),
+                       "F4=HID 0x000C:0x0221, F5=HID 0x000C:0x00CF")
+        XCTAssertEqual(FunctionRowMetadata.sanitizedSummary("0x70000003f,0x10000009b,0x700000004,0x700000005"),
+                       "F6=HID 0x0001:0x009B")
+        XCTAssertNil(FunctionRowMetadata.sanitizedSummary("0x00070004,0x00070005"))
+        XCTAssertNil(FunctionRowMetadata.sanitizedSummary("0x0007003d,private document text"))
+        XCTAssertNil(FunctionRowMetadata.sanitizedSummary("0x0007003d"))
+        XCTAssertNil(FunctionRowMetadata.sanitizedSummary(String(repeating: "a", count: 9000)))
     }
 }

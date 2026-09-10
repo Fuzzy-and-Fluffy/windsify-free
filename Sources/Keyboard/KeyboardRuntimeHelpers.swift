@@ -321,6 +321,23 @@ enum KeyboardEmergencyRelease {
 
 /// Converts public macOS media-key events emitted by laptop top rows into
 /// ordinary F-key strokes. Unknown consumer keys fail open.
+/// Apple Silicon action keys can arrive as ordinary Quartz key events rather
+/// than NX_SYSDEFINED. Keep that namespace separate from HID usages and NX
+/// auxiliary key types. See docs/function-key-compatibility.md for evidence.
+enum AppleActionKey {
+    static let functionKeys: [UInt16: UInt16] = [
+        0xA0: MacKeyCode.f3, // Mission Control
+        0xB0: MacKeyCode.f5, // Dictation (also emitted by a configured Globe key)
+        0xB1: MacKeyCode.f4, // Spotlight
+        0xB2: MacKeyCode.f6, // Do Not Disturb
+    ]
+
+    static let names: [UInt16: String] = [
+        0xA0: "Mission Control", 0xB0: "Dictation",
+        0xB1: "Spotlight", 0xB2: "Do Not Disturb",
+    ]
+}
+
 enum SystemDefinedKeyDecoder {
     // These two auxiliary-key values are emitted by modern Apple keyboards
     // but are not named in the public SDK header.
@@ -336,8 +353,10 @@ enum SystemDefinedKeyDecoder {
         Int(NX_KEYTYPE_ILLUMINATION_DOWN): MacKeyCode.f5,
         Int(NX_KEYTYPE_ILLUMINATION_UP): MacKeyCode.f6,
         Int(NX_KEYTYPE_PREVIOUS): MacKeyCode.f7,
+        Int(NX_KEYTYPE_REWIND): MacKeyCode.f7,
         Int(NX_KEYTYPE_PLAY): MacKeyCode.f8,
         Int(NX_KEYTYPE_NEXT): MacKeyCode.f9,
+        Int(NX_KEYTYPE_FAST): MacKeyCode.f9,
         Int(NX_KEYTYPE_MUTE): MacKeyCode.f10,
         Int(NX_KEYTYPE_SOUND_DOWN): MacKeyCode.f11,
         Int(NX_KEYTYPE_SOUND_UP): MacKeyCode.f12,
