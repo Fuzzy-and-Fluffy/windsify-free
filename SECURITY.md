@@ -1,7 +1,7 @@
 # Security
 
 Please report vulnerabilities privately to
-[hello@wondering.works](mailto:hello@wondering.works). Do not open a public
+[hello@windsify.com](mailto:hello@windsify.com). Do not open a public
 issue containing exploit details, typed content, credentials, or personal
 information.
 

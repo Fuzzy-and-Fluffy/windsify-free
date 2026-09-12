@@ -81,7 +81,7 @@ struct ShortcutSupportView: View {
         .sheet(isPresented: $showsReport) {
             VStack(alignment: .leading, spacing: 14) {
                 Text("Send to Windsify Support").font(.title2.bold())
-                Text("We'll open an email draft to hello@wondering.works with this report. Nothing is sent until you send the email.")
+                Text("We'll open an email draft to hello@windsify.com with this report. Nothing is sent until you send the email.")
                 Text("Already included: Windsify and macOS versions, keyboard information, service status and your test result. No typing history or personal documents.")
                     .font(.callout).foregroundStyle(.secondary)
                 DisclosureGroup("View report details", isExpanded: $showsReportDetails) {

@@ -144,7 +144,7 @@ final class ShortcutSupportModel: ObservableObject {
     func openEmail() {
         var components = URLComponents()
         components.scheme = "mailto"
-        components.path = "hello@wondering.works"
+        components.path = "hello@windsify.com"
         components.queryItems = [
             URLQueryItem(name: "subject", value: "Windsify shortcut support"),
             URLQueryItem(name: "body", value: "Hi Windsify Support,\n\nI need help with this shortcut. Here is the report collected by Windsify:\n\n" + report)
@@ -152,7 +152,7 @@ final class ShortcutSupportModel: ObservableObject {
         if let url = components.url, NSWorkspace.shared.open(url) {
             feedbackMessage = "Your email app will open a draft with the report. Review it and press Send when ready."
         } else {
-            feedbackMessage = "We couldn't open your email app. Copy the report and email it to hello@wondering.works."
+            feedbackMessage = "We couldn't open your email app. Copy the report and email it to hello@windsify.com."
         }
     }
 
