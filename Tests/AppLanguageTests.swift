@@ -33,7 +33,8 @@ final class AppLanguageTests: XCTestCase {
                                        "windowFillArea": "keepDockVisible", "licenseFixture": "untouched"]
         existing.forEach { defaults.set($0.value, forKey: $0.key) }
         let store = AppLanguageStore(defaults: defaults)
-        XCTAssertEqual(store.selection, .system)
+        XCTAssertEqual(store.selection, .english)
+        XCTAssertFalse(store.showsFirstLaunchChoice)
         store.select(.simplifiedChinese)
         XCTAssertEqual(AppLanguageStore(defaults: defaults).selection, .simplifiedChinese)
         store.select(.english)
@@ -43,7 +44,78 @@ final class AppLanguageTests: XCTestCase {
             XCTAssertEqual(defaults.object(forKey: key) as? NSObject, value as? NSObject)
         }
         defaults.set("unknown-future-language", forKey: AppLanguageStore.preferenceKey)
-        XCTAssertEqual(AppLanguageStore(defaults: defaults).selection, .system)
+        XCTAssertEqual(AppLanguageStore(defaults: defaults).selection, .english)
+        XCTAssertEqual(defaults.string(forKey: AppLanguageStore.preferenceKey), "unknown-future-language")
+    }
+
+    @MainActor
+    func testLegacyFreeTrialAndPaidInstallationsStayEnglish() throws {
+        for key in ["keyboardTranslationEnabled", "trialFirstLaunchAt", "runtimeWindowEngineRunning"] {
+            let suite = "WindsifyLanguageTests.\(UUID().uuidString)"
+            let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+            defer { defaults.removePersistentDomain(forName: suite) }
+            defaults.set(false, forKey: key) // Presence, not truthiness, identifies past use.
+            let existing = AppLanguageStore.hasExistingInstallation(
+                defaults: defaults, accessibilityGranted: false, fileExists: { _ in false }
+            )
+            XCTAssertTrue(existing, key)
+            let store = AppLanguageStore(defaults: defaults, hasExistingInstallation: existing)
+            XCTAssertEqual(store.selection.resolvedIdentifier(preferredLanguages: ["zh-CN"]), "en")
+            XCTAssertFalse(store.showsFirstLaunchChoice)
+            XCTAssertEqual(defaults.object(forKey: key) as? Bool, false)
+        }
+    }
+
+    @MainActor
+    func testFreshInstallOffersChoiceOnlyOnFirstLaunchEvenIfDismissedOrQuit() throws {
+        for makeChoice in [false, true] {
+            let suite = "WindsifyLanguageTests.\(UUID().uuidString)"
+            let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+            defer { defaults.removePersistentDomain(forName: suite) }
+            let store = AppLanguageStore(defaults: defaults, hasExistingInstallation: false)
+            XCTAssertTrue(store.showsFirstLaunchChoice)
+            XCTAssertEqual(store.selection, .english)
+            if makeChoice {
+                store.select(.simplifiedChinese)
+                store.dismissFirstLaunchChoice()
+                XCTAssertFalse(store.showsFirstLaunchChoice)
+            }
+            // No version parameter: restart and future language releases use the same marker.
+            let next = AppLanguageStore(defaults: defaults, hasExistingInstallation: false)
+            XCTAssertFalse(next.showsFirstLaunchChoice)
+            XCTAssertEqual(next.selection, makeChoice ? .simplifiedChinese : .english)
+            defaults.removeObject(forKey: AppLanguageStore.preferenceKey)
+            XCTAssertFalse(AppLanguageStore(defaults: defaults, hasExistingInstallation: false).showsFirstLaunchChoice)
+        }
+    }
+
+    @MainActor
+    func testEveryExplicitChoiceSurvivesMigrationAndNeverPrompts() throws {
+        for language in AppLanguage.allCases {
+            let suite = "WindsifyLanguageTests.\(UUID().uuidString)"
+            let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+            defer { defaults.removePersistentDomain(forName: suite) }
+            defaults.set(language.rawValue, forKey: AppLanguageStore.preferenceKey)
+            let store = AppLanguageStore(defaults: defaults, hasExistingInstallation: false)
+            XCTAssertEqual(store.selection, language)
+            XCTAssertFalse(store.showsFirstLaunchChoice)
+        }
+    }
+
+    @MainActor
+    func testInstallEvidenceUsesPermissionAndDurableFilesWithoutReadingCredentials() throws {
+        let suite = "WindsifyLanguageTests.\(UUID().uuidString)"
+        let defaults = try XCTUnwrap(UserDefaults(suiteName: suite))
+        defer { defaults.removePersistentDomain(forName: suite) }
+        let home = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
+        try FileManager.default.createDirectory(at: home, withIntermediateDirectories: true)
+        defer { try? FileManager.default.removeItem(at: home) }
+        XCTAssertFalse(AppLanguageStore.hasExistingInstallation(defaults: defaults, accessibilityGranted: false, home: home))
+        let mirror = home.appendingPathComponent("Library/Application Support/Windsify Mac")
+        try FileManager.default.createDirectory(at: mirror, withIntermediateDirectories: true)
+        XCTAssertTrue(AppLanguageStore.hasExistingInstallation(defaults: defaults, accessibilityGranted: false, home: home))
+        XCTAssertTrue(AppLanguageStore.hasExistingInstallation(defaults: defaults, accessibilityGranted: true, fileExists: { _ in false }))
+        XCTAssertTrue(AppLanguageStore.hasExistingInstallation(defaults: defaults, accessibilityGranted: false, fileExists: { _ in throw CocoaError(.fileReadNoPermission) }))
     }
 
     func testBundledChineseAndEnglishWithSafeFallback() throws {

@@ -338,3 +338,6 @@
 "macOS is protecting keyboard input, for example while a password field is active. Leave that field and try again." = "macOS 正在保护键盘输入，例如当前选中了密码输入框。请离开该输入框后重试。";
 "window management" = "窗口管理";
 "Finder Ctrl+X, then Ctrl+V" = "Finder Ctrl+X，然后 Ctrl+V";
+
+"Continue / 继续" = "Continue / 继续";
+"Language / 语言" = "Language / 语言";

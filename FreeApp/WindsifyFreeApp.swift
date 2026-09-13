@@ -31,8 +31,16 @@ final class WindsifyFreeAppDelegate: NSObject, NSApplicationDelegate {
 struct WindsifyFreeApp: App {
     @NSApplicationDelegateAdaptor(WindsifyFreeAppDelegate.self)
     private var appDelegate
-    @StateObject private var appState = FreeAppState()
-    @StateObject private var language = AppLanguageStore()
+    @StateObject private var appState: FreeAppState
+    @StateObject private var language: AppLanguageStore
+
+    init() {
+        let languageStore = AppLanguageStore(
+            hasExistingInstallation: AppLanguageStore.hasExistingInstallation()
+        )
+        _language = StateObject(wrappedValue: languageStore)
+        _appState = StateObject(wrappedValue: FreeAppState())
+    }
 
     var body: some Scene {
         Window("Windsify Free", id: FreeWindowID.settings) {
