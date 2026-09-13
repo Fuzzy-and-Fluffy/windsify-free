@@ -20,6 +20,7 @@ targets:
     sources:
       - FreeApp
       - Sources/Keyboard
+      - Sources/Shared/AppLanguage.swift
       - Sources/Shared/Models.swift
       - Sources/Shared/AppVersionPresentation.swift
       - Sources/Diagnostics/ConflictDiagnostics.swift
@@ -31,6 +32,8 @@ targets:
     info:
       path: FreeApp/Info.plist
       properties:
+        CFBundleDevelopmentRegion: en
+        CFBundleLocalizations: [en, zh-Hans]
         CFBundleDisplayName: Windsify Free
         CFBundleShortVersionString: "$(MARKETING_VERSION)"
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
@@ -43,8 +46,8 @@ targets:
         PRODUCT_MODULE_NAME: WindsifyMac
         CODE_SIGN_STYLE: Automatic
         ENABLE_HARDENED_RUNTIME: YES
-        MARKETING_VERSION: 1.3.1
-        CURRENT_PROJECT_VERSION: 42
+        MARKETING_VERSION: 1.4.0
+        CURRENT_PROJECT_VERSION: 49
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
 
@@ -52,6 +55,7 @@ targets:
     type: bundle.unit-test
     platform: macOS
     sources:
+      - Tests/AppLanguageTests.swift
       - Tests/FreeKeyboardEngineTests.swift
       - Tests/KeyboardRuntimeHelpersTests.swift
       - Tests/ConflictDiagnosticsTests.swift

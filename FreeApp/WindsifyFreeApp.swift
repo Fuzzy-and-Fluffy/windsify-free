@@ -32,10 +32,14 @@ struct WindsifyFreeApp: App {
     @NSApplicationDelegateAdaptor(WindsifyFreeAppDelegate.self)
     private var appDelegate
     @StateObject private var appState = FreeAppState()
+    @StateObject private var language = AppLanguageStore()
 
     var body: some Scene {
         Window("Windsify Free", id: FreeWindowID.settings) {
             FreeSettingsView(appState: appState)
+                .environment(\.locale, language.locale)
+                .id(language.selection)
+                .environmentObject(language)
                 .onReceive(
                     NotificationCenter.default.publisher(
                         for: NSApplication.didBecomeActiveNotification
@@ -48,6 +52,8 @@ struct WindsifyFreeApp: App {
 
         MenuBarExtra {
             FreeMenuBarView(appState: appState)
+                .environment(\.locale, language.locale)
+                .id(language.selection)
         } label: {
             Image(systemName: "keyboard.fill")
                 .accessibilityLabel("Windsify Free")
