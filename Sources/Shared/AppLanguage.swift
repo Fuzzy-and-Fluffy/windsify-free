@@ -1,3 +1,4 @@
+import ApplicationServices
 import Combine
 import Foundation
 import SwiftUI
@@ -23,12 +24,67 @@ enum AppLanguage: String, CaseIterable, Identifiable {
 @MainActor
 final class AppLanguageStore: ObservableObject {
     static let preferenceKey = "interfaceLanguage"
+    // Intentionally independent of app version and the list of supported languages.
+    static let initializedKey = "interfaceLanguageInitialized"
     @Published private(set) var selection: AppLanguage
+    @Published private(set) var showsFirstLaunchChoice: Bool
     private let defaults: UserDefaults
 
-    init(defaults: UserDefaults = .standard) {
+    init(defaults: UserDefaults = .standard, hasExistingInstallation: Bool = true) {
         self.defaults = defaults
-        selection = defaults.string(forKey: Self.preferenceKey).flatMap(AppLanguage.init(rawValue:)) ?? .system
+        let stored = defaults.string(forKey: Self.preferenceKey)
+        let initialized = defaults.object(forKey: Self.initializedKey) != nil
+        showsFirstLaunchChoice = stored == nil && !initialized && !hasExistingInstallation
+        // Unknown future values are preserved on disk and never restart onboarding.
+        selection = stored.flatMap(AppLanguage.init(rawValue:)) ?? .english
+        if stored == nil {
+            defaults.set(AppLanguage.english.rawValue, forKey: Self.preferenceKey)
+        }
+        // Even quitting without making a choice must not repeat the welcome next launch.
+        defaults.set(true, forKey: Self.initializedKey)
+    }
+
+    func dismissFirstLaunchChoice() {
+        showsFirstLaunchChoice = false
+    }
+
+    /// Evaluate before AppState creates trial records or writes runtime preferences.
+    /// Never inspect credential contents or alter permissions to classify an install.
+    static func hasExistingInstallation(
+        defaults: UserDefaults = .standard,
+        accessibilityGranted: Bool = AXIsProcessTrusted(),
+        home: URL = FileManager.default.homeDirectoryForCurrentUser,
+        fileExists: (URL) throws -> Bool = { url in
+            do {
+                _ = try FileManager.default.attributesOfItem(atPath: url.path)
+                return true
+            } catch let error as NSError where error.domain == NSCocoaErrorDomain
+                && [NSFileNoSuchFileError, NSFileReadNoSuchFileError].contains(error.code) {
+                return false
+            }
+        }
+    ) -> Bool {
+        let legacyKeys = [
+            "windowManagementEnabled", "keyboardTranslationEnabled", "windowFillArea",
+            "legacyWindowsModeEnabled", "accessibilityGuideSeen", "keyboardAdvancedExplainerSeen",
+            "runtimeAccessibilityGranted", "runtimeWindowEngineRunning",
+            "runtimeKeyboardEngineRunning", "runtimeKeyboardBlocked", "trialFirstLaunchAt"
+        ]
+        if accessibilityGranted || legacyKeys.contains(where: { defaults.object(forKey: $0) != nil }) {
+            return true
+        }
+        // Durable mirrors also cover returning customers whose preferences were removed.
+        // Unreadable storage is treated conservatively as an existing installation.
+        for relativePath in [
+            "Library/Application Support/Windsify Mac",
+            "Library/Saved Application State/app.windsify.mac.savedState",
+            "Library/Saved Application State/app.windsify.mac.free.savedState"
+        ] {
+            do {
+                if try fileExists(home.appendingPathComponent(relativePath)) { return true }
+            } catch { return true }
+        }
+        return false
     }
 
     var locale: Locale { Locale(identifier: selection.resolvedIdentifier()) }
@@ -42,7 +98,7 @@ final class AppLanguageStore: ObservableObject {
 enum L10n {
     static var locale: Locale {
         let selected = UserDefaults.standard.string(forKey: "interfaceLanguage")
-            .flatMap(AppLanguage.init(rawValue:)) ?? .system
+            .flatMap(AppLanguage.init(rawValue:)) ?? .english
         return Locale(identifier: selected.resolvedIdentifier())
     }
 
@@ -111,17 +167,37 @@ enum L10n {
     }
 }
 
+/// Inline welcome, never a blocking modal or an update-triggered window.
+struct FirstLaunchLanguageChoice: View {
+    @EnvironmentObject private var language: AppLanguageStore
+
+    var body: some View {
+        if language.showsFirstLaunchChoice {
+            VStack(alignment: .leading, spacing: 8) {
+                Text(verbatim: "Welcome to Windsify · 欢迎使用 Windsify")
+                    .font(.headline)
+                Text(verbatim: "Choose your language below. You can change it anytime in Settings.\n请在下方选择语言，之后也可以随时在设置中更改。")
+                    .font(.caption).fixedSize(horizontal: false, vertical: true)
+            }
+        }
+    }
+}
+
 struct LanguageSettingsSection: View {
     @EnvironmentObject private var language: AppLanguageStore
 
     var body: some View {
         Section("Language") {
+            FirstLaunchLanguageChoice()
             Picker("Language", selection: Binding(
                 get: { language.selection }, set: { language.select($0) }
             )) {
                 Text("Follow System").tag(AppLanguage.system)
                 Text(verbatim: "简体中文").tag(AppLanguage.simplifiedChinese)
                 Text(verbatim: "English").tag(AppLanguage.english)
+            }
+            if language.showsFirstLaunchChoice {
+                Button("Continue / 继续") { language.dismissFirstLaunchChoice() }
             }
             Link("Read the user guide", destination: URL(string: language.locale.identifier == "zh-Hans" ? "https://windsify.com/zh/guides" : "https://windsify.com/guides")!)
             Text("Changes the interface language only. Keyboard shortcuts and license settings stay the same.")
