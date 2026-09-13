@@ -6,6 +6,7 @@ struct FreeSettingsView: View {
 
     var body: some View {
         Form {
+            LanguageSettingsSection()
             Section("Windows keyboard essentials") {
                 Toggle(
                     "Enable Windows keyboard shortcuts",
@@ -18,7 +19,7 @@ struct FreeSettingsView: View {
                 )
 
                 LabeledContent("Keyboard engine") {
-                    Text(engineStatus)
+                    Text(L10n.text(engineStatus))
                 }
 
                 if appState.accessibilityStatus == .notGranted {
@@ -35,8 +36,7 @@ struct FreeSettingsView: View {
 
                 if appState.keyboardIsBlockedByConflicts {
                     Label(
-                        "Keyboard translation is paused by a conflicting "
-                            + "remapper.",
+                        "Keyboard translation is paused by a conflicting remapper.",
                         systemImage: "exclamationmark.octagon.fill"
                     )
                     .foregroundStyle(.orange)
@@ -55,9 +55,7 @@ struct FreeSettingsView: View {
                 shortcut("Application / Menu", "Open contextual menu")
 
                 Text(
-                    "Ctrl+Space, Ctrl+Tab, Terminal Ctrl shortcuts, remote "
-                        + "desktop input, secure input, and Shift+Arrow "
-                        + "selection remain native."
+                    "Ctrl+Space, Ctrl+Tab, Terminal Ctrl shortcuts, remote desktop input, secure input, and Shift+Arrow selection remain native."
                 )
                 .font(.caption)
                 .foregroundStyle(.secondary)
@@ -67,9 +65,9 @@ struct FreeSettingsView: View {
                 Section("Compatibility") {
                     ForEach(appState.relevantConflicts) { conflict in
                         VStack(alignment: .leading, spacing: 4) {
-                            Text(conflict.title).font(.headline)
-                            Text(conflict.message)
-                            Text(conflict.recommendation)
+                            Text(L10n.text(conflict.title)).font(.headline)
+                            Text(conflict.localizedMessage)
+                            Text(L10n.text(conflict.recommendation))
                                 .foregroundStyle(.secondary)
                         }
                         .font(.caption)
@@ -135,7 +133,7 @@ struct FreeSettingsView: View {
                 appState.clearError()
             }
         } message: {
-            Text(appState.lastErrorMessage ?? "Unknown error")
+            Text(L10n.message(appState.lastErrorMessage ?? "Unknown error"))
         }
     }
 
@@ -154,7 +152,7 @@ struct FreeSettingsView: View {
 
     private func shortcut(_ keys: String, _ action: String) -> some View {
         LabeledContent(keys) {
-            Text(action).foregroundStyle(.secondary)
+            Text(L10n.text(action)).foregroundStyle(.secondary)
         }
     }
 }

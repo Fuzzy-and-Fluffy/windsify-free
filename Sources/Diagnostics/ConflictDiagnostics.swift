@@ -18,6 +18,14 @@ struct ConflictFinding: Identifiable, Equatable {
     let recommendation: String
     let severity: ConflictSeverity
     let affectedCapabilities: Set<ConflictCapability>
+    let messageFormat: String?
+    let messageArguments: [String]
+
+    var localizedMessage: String {
+        guard let messageFormat else { return L10n.text(message) }
+        return String(format: L10n.text(messageFormat), locale: L10n.locale,
+                      arguments: messageArguments.map { L10n.text($0) })
+    }
 
     init(
         id: String,
@@ -25,8 +33,12 @@ struct ConflictFinding: Identifiable, Equatable {
         message: String,
         recommendation: String,
         severity: ConflictSeverity,
-        affectedCapabilities: Set<ConflictCapability> = []
+        affectedCapabilities: Set<ConflictCapability> = [],
+        messageFormat: String? = nil,
+        messageArguments: [String] = []
     ) {
+        self.messageFormat = messageFormat
+        self.messageArguments = messageArguments
         self.id = id
         self.title = title
         self.message = message
@@ -224,7 +236,9 @@ struct ApplicationConflictRule: ConflictRule {
                     + "Windsify Mac \(capabilityDescription).",
                 recommendation: recommendation,
                 severity: effectiveSeverity,
-                affectedCapabilities: affectedCapabilities
+                affectedCapabilities: affectedCapabilities,
+                messageFormat: "%@ %@ and may overlap with Windsify Mac %@.",
+                messageArguments: [title, stateDescription, capabilityDescription]
             ),
         ]
     }
@@ -252,7 +266,9 @@ struct HIDUtilConflictRule: ConflictRule {
                     + "keyboard translation layer. The window manager will "
                     + "not remove it.",
                 severity: .blocking,
-                affectedCapabilities: [.keyboardTranslation]
+                affectedCapabilities: [.keyboardTranslation],
+                messageFormat: "A system-level hidutil UserKeyMapping contains %@ active mapping(s), which can transform keys before Windsify Mac receives them.",
+                messageArguments: [String(snapshot.hidutilUserKeyMappingCount)]
             ),
         ]
     }
@@ -276,7 +292,9 @@ struct MacOSModifierMappingConflictRule: ConflictRule {
                     + "Shortcuts → Modifier Keys. Windsify Mac will not alter "
                     + "these settings.",
                 severity: .blocking,
-                affectedCapabilities: [.keyboardTranslation]
+                affectedCapabilities: [.keyboardTranslation],
+                messageFormat: "macOS has %@ saved keyboard modifier mapping(s). These can overlap with Windsify Mac's shortcut translation.",
+                messageArguments: [String(count)]
             ),
         ]
     }
