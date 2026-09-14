@@ -396,3 +396,20 @@
 "Switch to Claude and press Ctrl+C or Ctrl+V once. Return here for the result. The check stops after one shortcut or 60 seconds." = "切换到 Claude，按一次 Ctrl+C 或 Ctrl+V，然后返回这里查看结果。检查在捕获一次快捷键后或 60 秒后停止。";
 
 "Live check: your shortcut runs normally. Only one Claude Ctrl+C or Ctrl+V decision is kept in memory. No text, selection or clipboard content is collected." = "实际按键检查：快捷键照常执行。内存中只保留一次 Claude Ctrl+C 或 Ctrl+V 的处理结果，不收集正文、选区或剪贴板内容。";
+
+// Automatic VS Code integration
+"Automatically configure VS Code terminal" = "自动配置 VS Code 终端";
+"Ctrl+C copies and clears a terminal selection, or interrupts when nothing is selected. Ctrl+V pastes. Ctrl+Shift+C/V also work." = "Ctrl+C 复制并清除终端选区；没有选区时中断命令。Ctrl+V 粘贴，也支持 Ctrl+Shift+C/V。";
+"Open VS Code once. Terminal support will be configured automatically." = "打开一次 VS Code，终端支持将自动配置。";
+"VS Code terminal support is configured automatically. No window reload is normally needed." = "VS Code 终端支持已自动配置，通常无需重载窗口。";
+"Automatic VS Code terminal support is off. Windsify terminal bindings have been removed." = "VS Code 自动终端支持已关闭，Windsify 的终端规则已移除。";
+
+"Pro automatically configures your local VS Code profiles and backs up existing shortcuts. Turning this off removes Windsify's terminal bindings. Custom user-data directories on the internal disk are also supported. Workspace shortcut overrides may require review." = "Pro 自动配置本机的 VS Code 配置档案，并备份原有快捷键。关闭后会移除 Windsify 的终端规则。也支持正在运行的 VS Code 在内置磁盘上的自定义数据目录。工作区的快捷键覆盖设置可能需要检查。";
+
+"Some VS Code instances could not be configured. Their terminal shortcuts remain native." = "部分 VS Code 实例无法自动配置，其终端快捷键保持原生行为。";
+
+"A VS Code profile uses a symbolic link. Automatic terminal support needs a local profile directory." = "某个 VS Code 配置档案使用符号链接。自动终端支持需要本地配置档案目录。";
+
+"VS Code sends shortcuts directly to the shell. Turn off terminal.integrated.sendKeybindingsToShell to enable terminal support." = "VS Code 当前将快捷键直接发送给 Shell。请关闭 terminal.integrated.sendKeybindingsToShell 后使用终端支持。";
+
+"Automatic VS Code setup requires a profile on this Mac's internal disk. External or network profiles are left unchanged to avoid background file-access prompts." = "自动配置需要 VS Code 配置位于本机内置磁盘。外置盘或网络盘配置保持不变，以免后台触发文件访问弹窗。";

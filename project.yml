@@ -49,8 +49,8 @@ targets:
         PRODUCT_MODULE_NAME: WindsifyMac
         CODE_SIGN_STYLE: Automatic
         ENABLE_HARDENED_RUNTIME: YES
-        MARKETING_VERSION: 1.4.12
-        CURRENT_PROJECT_VERSION: 81
+        MARKETING_VERSION: 1.4.13
+        CURRENT_PROJECT_VERSION: 82
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
       configs:

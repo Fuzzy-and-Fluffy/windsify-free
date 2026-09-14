@@ -396,3 +396,20 @@
 "Switch to Claude and press Ctrl+C or Ctrl+V once. Return here for the result. The check stops after one shortcut or 60 seconds." = "Switch to Claude and press Ctrl+C or Ctrl+V once. Return here for the result. The check stops after one shortcut or 60 seconds.";
 
 "Live check: your shortcut runs normally. Only one Claude Ctrl+C or Ctrl+V decision is kept in memory. No text, selection or clipboard content is collected." = "Live check: your shortcut runs normally. Only one Claude Ctrl+C or Ctrl+V decision is kept in memory. No text, selection or clipboard content is collected.";
+
+// Automatic VS Code integration
+"Automatically configure VS Code terminal" = "Automatically configure VS Code terminal";
+"Ctrl+C copies and clears a terminal selection, or interrupts when nothing is selected. Ctrl+V pastes. Ctrl+Shift+C/V also work." = "Ctrl+C copies and clears a terminal selection, or interrupts when nothing is selected. Ctrl+V pastes. Ctrl+Shift+C/V also work.";
+"Open VS Code once. Terminal support will be configured automatically." = "Open VS Code once. Terminal support will be configured automatically.";
+"VS Code terminal support is configured automatically. No window reload is normally needed." = "VS Code terminal support is configured automatically. No window reload is normally needed.";
+"Automatic VS Code terminal support is off. Windsify terminal bindings have been removed." = "Automatic VS Code terminal support is off. Windsify terminal bindings have been removed.";
+
+"Pro automatically configures your local VS Code profiles and backs up existing shortcuts. Turning this off removes Windsify's terminal bindings. Custom user-data directories on the internal disk are also supported. Workspace shortcut overrides may require review." = "Pro automatically configures your local VS Code profiles and backs up existing shortcuts. Turning this off removes Windsify's terminal bindings. Custom user-data directories on the internal disk are also supported. Workspace shortcut overrides may require review.";
+
+"Some VS Code instances could not be configured. Their terminal shortcuts remain native." = "Some VS Code instances could not be configured. Their terminal shortcuts remain native.";
+
+"A VS Code profile uses a symbolic link. Automatic terminal support needs a local profile directory." = "A VS Code profile uses a symbolic link. Automatic terminal support needs a local profile directory.";
+
+"VS Code sends shortcuts directly to the shell. Turn off terminal.integrated.sendKeybindingsToShell to enable terminal support." = "VS Code sends shortcuts directly to the shell. Turn off terminal.integrated.sendKeybindingsToShell to enable terminal support.";
+
+"Automatic VS Code setup requires a profile on this Mac's internal disk. External or network profiles are left unchanged to avoid background file-access prompts." = "Automatic VS Code setup requires a profile on this Mac's internal disk. External or network profiles are left unchanged to avoid background file-access prompts.";
