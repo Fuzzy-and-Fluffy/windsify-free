@@ -2,6 +2,24 @@ import AppKit
 import Carbon
 import Foundation
 
+/// A native key-down must not acquire a different mapping on repeat/key-up
+/// after the user moves focus into another pane or changes a preference.
+struct NativeKeyboardTransactionStore {
+    private var pressed: Set<UInt16> = []
+
+    mutating func begin(_ keyCode: UInt16) { pressed.insert(keyCode) }
+
+    mutating func continues(_ stroke: KeyboardStroke, isRepeat: Bool) -> Bool {
+        if stroke.phase == .down && !isRepeat {
+            pressed.remove(stroke.keyCode)
+            return false
+        }
+        guard stroke.phase != .flagsChanged, pressed.contains(stroke.keyCode) else { return false }
+        if stroke.phase == .up { pressed.remove(stroke.keyCode) }
+        return true
+    }
+}
+
 /// Classifies Accessibility metadata without reading an element's text value.
 /// Web editors frequently expose a generic role plus editable/settable
 /// metadata instead of a native AXTextField or AXTextArea role.

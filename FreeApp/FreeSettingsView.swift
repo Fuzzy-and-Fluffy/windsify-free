@@ -8,6 +8,7 @@ struct FreeSettingsView: View {
         Form {
             LanguageSettingsSection()
             Section("Windows keyboard essentials") {
+                VSCodeCompatibilityView()
                 Toggle(
                     "Enable Windows keyboard shortcuts",
                     isOn: Binding(

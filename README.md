@@ -35,6 +35,16 @@ macOS does not expose the standard Windows Menu key through that event tap, a
 non-seizing HID listener additionally accepts only its standard `0x65` usage.
 The app does not record typed text or use a kernel or DriverKit extension.
 
+Stable desktop VS Code uses focused-input handling in Free and Pro. Use
+**Set up VS Code terminal** in settings for Ctrl+C to copy and clear a selection,
+or interrupt without a selection; Ctrl+V pastes, and Ctrl+Shift+C/V also work.
+Setup backs up the default VS Code keybindings file and appends a removable
+block, preserving unrelated rules and comments. These VS Code bindings remain
+active when Windsify is off; **Remove terminal setup** removes the block.
+After setup or removal, run **Developer: Reload Window** in VS Code’s Command
+Palette to apply the change.
+Windsify reads local input structure, never terminal or selection text.
+
 ## Shortcut Help
 
 Click **Shortcut Help**, then **Test shortcut**, and press the combination once.

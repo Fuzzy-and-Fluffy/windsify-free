@@ -341,3 +341,24 @@
 
 "Continue / 继续" = "Continue / 继续";
 "Language / 语言" = "Language / 语言";
+
+/* VS Code terminal compatibility */
+"Use native keyboard shortcuts in VS Code" = "Use native keyboard shortcuts in VS Code";
+"Windsify leaves VS Code keyboard shortcuts unchanged." = "Windsify leaves VS Code keyboard shortcuts unchanged.";
+"VS Code: Ctrl+C copies in the editor and stays native in the terminal. Use Ctrl+Shift+C/V to copy/paste in the terminal. If focus cannot be identified, Control shortcuts pass through unchanged." = "VS Code: Ctrl+C copies in the editor and stays native in the terminal. Use Ctrl+Shift+C/V to copy/paste in the terminal. If focus cannot be identified, Control shortcuts pass through unchanged.";
+"Custom VS Code keybindings can change these actions. Remove any older terminal Cmd+C/V remapping before using automatic handling." = "Custom VS Code keybindings can change these actions. Remove any older terminal Cmd+C/V remapping before using automatic handling.";
+
+/* VS Code Windows terminal setup */
+"VS Code: Windows shortcuts in the editor; terminal Control keys are handled by VS Code." = "VS Code: Windows shortcuts in the editor; terminal Control keys are handled by VS Code.";
+"Set up Windows terminal shortcuts: Ctrl+C copies and clears a selection, or interrupts when nothing is selected. Ctrl+V pastes. Ctrl+Shift+C/V also work." = "Set up Windows terminal shortcuts: Ctrl+C copies and clears a selection, or interrupts when nothing is selected. Ctrl+V pastes. Ctrl+Shift+C/V also work.";
+"Setup adds a removable block to the default VS Code profile and backs up the original file. It overrides older terminal copy/paste bindings while installed, including Cmd+C/V. These VS Code bindings remain active when Windsify is off." = "Setup adds a removable block to the default VS Code profile and backs up the original file. It overrides older terminal copy/paste bindings while installed, including Cmd+C/V. These VS Code bindings remain active when Windsify is off.";
+"Set up VS Code terminal" = "Set up VS Code terminal";
+"Remove terminal setup" = "Remove terminal setup";
+"VS Code terminal shortcuts are ready." = "VS Code terminal shortcuts are ready.";
+"Windsify's VS Code terminal setup was removed." = "Windsify's VS Code terminal setup was removed.";
+"VS Code keybindings must be a valid JSONC array. No changes were made." = "VS Code keybindings must be a valid JSONC array. No changes were made.";
+"The Windsify settings block was edited. Review it in VS Code before changing setup." = "The Windsify settings block was edited. Review it in VS Code before changing setup.";
+"Open the default VS Code profile once before setting up terminal shortcuts." = "Open the default VS Code profile once before setting up terminal shortcuts.";
+"VS Code keybindings changed during setup. Please try again." = "VS Code keybindings changed during setup. Please try again.";
+"VS Code terminal shortcuts are installed. Reload the VS Code window to apply them." = "VS Code terminal shortcuts are installed. Reload the VS Code window to apply them.";
+"Terminal setup was removed. Reload the VS Code window to apply the change." = "Terminal setup was removed. Reload the VS Code window to apply the change.";
