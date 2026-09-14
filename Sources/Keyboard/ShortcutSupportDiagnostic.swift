@@ -3,6 +3,7 @@ import Foundation
 enum ShortcutTestKind: String, CaseIterable, Identifiable {
     case closeWindow = "Close a window (Alt+F4)"
     case anotherShortcut = "Another shortcut"
+    case liveClaude = "Claude copy/paste (live check)"
     var id: String { rawValue }
 }
 

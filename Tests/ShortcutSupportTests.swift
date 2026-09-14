@@ -70,6 +70,64 @@ final class ShortcutSupportTests: XCTestCase {
         return event
     }
 
+    func testLiveClaudeCheckObservesOneActualDecisionWithoutChangingEvent() {
+        let model = makeModel()
+        model.kind = .liveClaude
+        model.isApplicationActive = { false }
+        model.start()
+        let key = event(code: MacKeyCode.c, flags: [.maskControl])
+        let originalFlags = key.flags
+        let stroke = KeyboardStroke(keyCode: MacKeyCode.c, modifiers: [.control])
+        let context = CodeEditorPolicy.context(bundleIdentifier: "com.anthropic.claudefordesktop", focus: .unknown)
+        let decision = RuleDecision(ruleID: "editor.unknown-native", action: .passThrough)
+        XCTAssertNil(model.intercept(type: .keyDown, event: key))
+        XCTAssertTrue(model.isListening)
+        model.observeLive(event: key, stroke: stroke, context: context, decision: decision, contextMilliseconds: 76)
+        XCTAssertEqual(model.result?.ruleID, "editor.unknown-native")
+        XCTAssertEqual(model.result?.outcome, "live-decision-captured")
+        XCTAssertEqual(key.flags, originalFlags)
+        XCTAssertEqual(key.getIntegerValueField(.eventSourceUserData), 0)
+        XCTAssertTrue(model.report.contains("Live focus: unknown"))
+        XCTAssertTrue(model.report.contains("Context lookup ms: 76"))
+        XCTAssertFalse(model.report.contains("Preview context: standard text input"))
+        XCTAssertFalse(model.isListening)
+        let report = model.report
+        model.observeLive(event: key, stroke: stroke, context: context,
+                          decision: .init(ruleID: "different", action: .suppress), contextMilliseconds: 0)
+        XCTAssertEqual(model.report, report)
+        XCTAssertNil(model.intercept(type: .keyUp, event: event(code: MacKeyCode.c, down: false, flags: [.maskControl])))
+    }
+
+    func testLiveCheckIgnoresUnarmedOtherAppTypingRepeatsAndSyntheticEvents() {
+        let model = makeModel()
+        model.kind = .liveClaude
+        let key = event(code: MacKeyCode.v, flags: [.maskControl])
+        let stroke = KeyboardStroke(keyCode: MacKeyCode.v, modifiers: [.control])
+        let context = CodeEditorPolicy.context(bundleIdentifier: "com.anthropic.claudefordesktop", focus: .textInput)
+        let decision = KeyboardMappingEngine().evaluate(stroke, context: context)
+        func observe(_ context: MappingContext, _ stroke: KeyboardStroke) {
+            model.observeLive(event: key, stroke: stroke, context: context, decision: decision, contextMilliseconds: 1)
+        }
+        observe(context, stroke)
+        XCTAssertNil(model.result)
+        model.start()
+        observe(.init(bundleIdentifier: "com.example.other"), stroke)
+        observe(context, .init(keyCode: MacKeyCode.v))
+        observe(context, .init(keyCode: MacKeyCode.a, modifiers: [.control]))
+        observe(context, .init(keyCode: MacKeyCode.v, phase: .up, modifiers: [.control]))
+        key.setIntegerValueField(.eventSourceUserData, value: CGEventTapController.syntheticEventMarker)
+        observe(context, stroke)
+        key.setIntegerValueField(.eventSourceUserData, value: 0)
+        key.setIntegerValueField(.keyboardEventAutorepeat, value: 1)
+        observe(context, stroke)
+        XCTAssertNil(model.result)
+        XCTAssertTrue(model.isListening)
+        key.setIntegerValueField(.keyboardEventAutorepeat, value: 0)
+        model.cancel()
+        observe(context, stroke)
+        XCTAssertNil(model.result)
+    }
+
     func testAltF4PreviewCapturesMappingWithoutDispatchingAndRetainsSingleSample() {
         let model = makeModel()
         model.start()

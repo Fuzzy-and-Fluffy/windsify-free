@@ -35,19 +35,21 @@ macOS does not expose the standard Windows Menu key through that event tap, a
 non-seizing HID listener additionally accepts only its standard `0x65` usage.
 The app does not record typed text or use a kernel or DriverKit extension.
 
-Free leaves recognized code editors and AI coding apps entirely native, based
-only on their app identifiers; it does not inspect their terminal focus.
-Pro adds Windows-style editing and terminal clipboard shortcuts in stable
-desktop VS Code. Use **Set up VS Code terminal** and then **Developer: Reload
-Window** in VS Code. Ctrl+C copies and clears a selection, or interrupts without
-a selection; Ctrl+V pastes, with Ctrl+Shift+C/V also supported.
-Setup backs up the default profile and adds removable Pro bridge bindings.
-These bindings do not remap ordinary keys when Windsify translation is off,
-Free is active, or native VS Code shortcuts are selected. Other recognized
-editors remain native until their integrations are individually supported.
-Known 1.4.2 terminal bindings are migrated with a backup; edited blocks require
-manual review. Reload VS Code after migration, setup or removal.
-Windsify reads local input structure only in Pro, never terminal or selection text.
+Both editions use their ordinary Windows-style mappings in confirmed editor
+and chat main views. Only the embedded terminal receives per-app treatment:
+Free preserves native terminal keys; Pro adds supported terminal integrations.
+Shared local Accessibility discovery reads roles and structural classes only,
+never typed, terminal, selected or clipboard text. Unknown focus preserves input.
+
+Pro's stable VS Code setup provides selection-aware Ctrl+C copy/interrupt and
+Windows-style paste. Use **Set up VS Code terminal**, then **Developer: Reload
+Window**. Setup backs up the default profile and adds removable Pro bridge
+bindings; Free does not emit those bridge chords. Codex and Claude use explicit
+Pro terminal copy/paste chords and retain Ctrl+C interrupt. Other registered
+editors use ordinary mappings when main focus is confirmed, with native
+terminal input until a terminal adapter is supported. Exact app identities are
+registered; this is not automatic detection of every possible editor.
+
 
 ## Shortcut Help
 

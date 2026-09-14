@@ -410,6 +410,7 @@ enum SystemDefinedKeyDecoder {
 
 enum SystemInputSourceCycler {
     static func selectNext() {
+        guard !InputRuntimeSafety.isTestHost else { return }
         let properties: [CFString: Any] = [
             kTISPropertyInputSourceCategory:
                 kTISCategoryKeyboardInputSource!,

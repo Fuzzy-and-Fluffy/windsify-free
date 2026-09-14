@@ -1,6 +1,6 @@
 import Foundation
 
-enum VSCodeInputContext: String, Equatable, Sendable {
+enum EditorInputContext: String, Equatable, Sendable {
     case unknown, textInput, terminal
 }
 
@@ -20,8 +20,19 @@ enum CodeEditorPolicy {
     static func contains(_ bundleIdentifier: String?) -> Bool {
         bundleIdentifier.map { bundleIdentifiers.contains($0.lowercased()) } ?? false
     }
-    static func nativeContext(_ bundleIdentifier: String?) -> MappingContext? {
+    static func context(bundleIdentifier: String?, focus: EditorInputContext) -> MappingContext {
+        MappingContext(bundleIdentifier: bundleIdentifier, isTextInput: focus == .textInput,
+                       isEmbeddedTerminal: focus == .terminal, editorInputContext: focus)
+    }
+
+    static func isMainView(_ context: MappingContext) -> Bool {
+        !context.isEmbeddedTerminal && context.editorInputContext != .terminal &&
+            (context.isTextInput || context.editorInputContext == .textInput)
+    }
+
+    static func resolveContext(_ bundleIdentifier: String?, processIdentifier: Int32) -> MappingContext? {
         guard contains(bundleIdentifier) else { return nil }
-        return MappingContext(bundleIdentifier: bundleIdentifier, keyboardMappingExcluded: true)
+        return context(bundleIdentifier: bundleIdentifier,
+                       focus: EditorAccessibilityFocus.resolve(processIdentifier: processIdentifier))
     }
 }

@@ -78,11 +78,16 @@ struct KeyboardMappingEngine: KeyboardMappingEvaluating, Sendable {
             return passThrough(ruleID: "native.secure-input")
         }
 
-        if context.keyboardMappingExcluded || CodeEditorPolicy.contains(context.bundleIdentifier) {
+        if context.keyboardMappingExcluded {
             return passThrough(ruleID: "native.application-excluded")
         }
         if isRemoteDesktop(context) {
             return passThrough(ruleID: "native.remote-desktop")
+        }
+        // Both tiers retain ordinary Windows mappings in confirmed main views.
+        // Free adds no terminal actions: terminal and unknown focus stay native.
+        if CodeEditorPolicy.contains(context.bundleIdentifier), !CodeEditorPolicy.isMainView(context) {
+            return passThrough(ruleID: "native.editor-terminal-or-unknown")
         }
 
         if stroke.keyCode == MacKeyCode.space,
@@ -348,7 +353,8 @@ struct KeyboardMappingEngine: KeyboardMappingEvaluating, Sendable {
     }
 
     func permitsHostShortcut(in context: MappingContext) -> Bool {
-        !context.isSecureInput && !context.keyboardMappingExcluded && !CodeEditorPolicy.contains(context.bundleIdentifier) && !isRemoteDesktop(context)
+        !context.isSecureInput && !context.keyboardMappingExcluded && !isRemoteDesktop(context) &&
+            (!CodeEditorPolicy.contains(context.bundleIdentifier) || CodeEditorPolicy.isMainView(context))
     }
 
     private func isTerminal(_ context: MappingContext) -> Bool {

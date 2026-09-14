@@ -24,7 +24,7 @@ extension KeyboardMappingEvaluating {
     func preservesCodeEditorKeyboard(bundleIdentifier: String?) -> Bool { CodeEditorPolicy.contains(bundleIdentifier) }
 
     func codeEditorContext(bundleIdentifier: String?, processIdentifier: Int32) -> MappingContext? {
-        CodeEditorPolicy.nativeContext(bundleIdentifier)
+        CodeEditorPolicy.resolveContext(bundleIdentifier, processIdentifier: processIdentifier)
     }
 
     func evaluate(_ stroke: KeyboardStroke) -> RuleDecision {

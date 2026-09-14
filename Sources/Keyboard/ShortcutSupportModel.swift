@@ -15,6 +15,7 @@ final class ShortcutSupportModel: ObservableObject {
     var statusProvider: () -> ShortcutSupportStatus = { ShortcutSupportStatus() }
     var isApplicationActive: () -> Bool = { NSApp.isActive }
     var secureInputProvider: () -> Bool = { IsSecureEventInputEnabled() }
+    var isLiveCheck: Bool { kind == .liveClaude }
     var evaluate: (KeyboardStroke) -> RuleDecision = {
         KeyboardMappingEngine().evaluate($0, context: MappingContext(isTextInput: true))
     }
@@ -26,6 +27,7 @@ final class ShortcutSupportModel: ObservableObject {
     private var metadata: [String] = []
 
     func show() {
+        guard !InputRuntimeSafety.isTestHost else { return }
         refresh()
         guard localMonitor == nil else { return }
         localMonitor = NSEvent.addLocalMonitorForEvents(matching: [.keyDown, .keyUp, .flagsChanged, .systemDefined]) { [weak self] event in
@@ -36,7 +38,10 @@ final class ShortcutSupportModel: ObservableObject {
             return suppress ? nil : event
         }
         resignObserver = NotificationCenter.default.addObserver(forName: NSApplication.didResignActiveNotification, object: nil, queue: .main) { [weak self] _ in
-            MainActor.assumeIsolated { self?.finishWithoutKey(lostFocus: true) }
+            MainActor.assumeIsolated {
+                guard let self, !self.isLiveCheck else { return }
+                self.finishWithoutKey(lostFocus: true)
+            }
         }
     }
 
@@ -62,7 +67,7 @@ final class ShortcutSupportModel: ObservableObject {
         capture.start()
         isListening = true
         deadline?.invalidate()
-        deadline = Timer.scheduledTimer(withTimeInterval: 10, repeats: false) { [weak self] _ in
+        deadline = Timer.scheduledTimer(withTimeInterval: isLiveCheck ? 60 : 10, repeats: false) { [weak self] _ in
             MainActor.assumeIsolated { self?.finishWithoutKey(lostFocus: false) }
         }
     }
@@ -78,6 +83,8 @@ final class ShortcutSupportModel: ObservableObject {
     /// Called by the existing main-run-loop event tap before decoding, and by
     /// a local window monitor when the translation service is not running.
     func intercept(type: CGEventType, event: CGEvent, source: String = "keyboard-service") -> Bool? {
+        // Live checks never consume, rewrite, or bypass the user's event.
+        guard !isLiveCheck else { return nil }
         guard event.getIntegerValueField(.eventSourceUserData) != CGEventTapController.syntheticEventMarker else { return nil }
         if type == .flagsChanged {
             guard capture.isListening, isApplicationActive() else { return nil }
@@ -117,8 +124,35 @@ final class ShortcutSupportModel: ObservableObject {
         return true
     }
 
+    func observeLive(event: CGEvent, stroke: KeyboardStroke, context: MappingContext,
+                     decision: RuleDecision, contextMilliseconds: Double) {
+        guard isLiveCheck, capture.isListening, stroke.phase == .down,
+              context.bundleIdentifier?.lowercased() == "com.anthropic.claudefordesktop",
+              [MacKeyCode.c, MacKeyCode.v].contains(stroke.keyCode), stroke.modifiers.contains(.control),
+              event.getIntegerValueField(.keyboardEventAutorepeat) == 0,
+              event.getIntegerValueField(.eventSourceUserData) != CGEventTapController.syntheticEventMarker else { return }
+        let sample = ShortcutInputSample(eventType: event.type.rawValue, keyCode: stroke.keyCode,
+            flags: event.flags.rawValue, modifiers: stroke.modifiers.map(\.rawValue).sorted(),
+            keyboardType: event.getIntegerValueField(.keyboardEventKeyboardType),
+            auxiliaryKeyType: nil, auxiliaryState: nil, source: "live-keyboard-service")
+        metadata += ["Live focus: \(context.editorInputContext.rawValue)",
+                     "Context lookup ms: \(Int(contextMilliseconds))",
+                     "Live secure input: \(context.isSecureInput)",
+                     "Live excluded: \(context.keyboardMappingExcluded)"]
+        complete(.init(title: "Claude shortcut captured", explanation:
+            "This is the real keyboard service decision. Normal shortcut processing was left unchanged; no text or clipboard content was collected.",
+            outcome: "live-decision-captured", sample: sample, ruleID: decision.ruleID,
+            output: ShortcutSupportResult.actionDescription(decision.action)))
+    }
+
     private func finishWithoutKey(lostFocus: Bool) {
         guard capture.isListening else { return }
+        if isLiveCheck {
+            complete(.init(title: "No Claude shortcut captured", explanation:
+                "No matching Ctrl+C or Ctrl+V decision reached this check within 60 seconds. This does not prove the keyboard sent nothing.",
+                outcome: "live-no-decision", sample: nil, ruleID: nil, output: nil))
+            return
+        }
         complete(.endedWithoutKey(sawModifier: capture.sawModifier, lostFocus: lostFocus, status: status))
     }
 
@@ -136,12 +170,14 @@ final class ShortcutSupportModel: ObservableObject {
     }
 
     func copyReport() {
+        guard !InputRuntimeSafety.isTestHost else { return }
         NSPasteboard.general.clearContents()
         NSPasteboard.general.setString(report, forType: .string)
         feedbackMessage = "Report copied. You can paste it into your reply to Windsify Support."
     }
 
     func openEmail() {
+        guard !InputRuntimeSafety.isTestHost else { return }
         var components = URLComponents()
         components.scheme = "mailto"
         components.path = "hello@windsify.com"
@@ -158,7 +194,7 @@ final class ShortcutSupportModel: ObservableObject {
 
     static func makeReport(kind: ShortcutTestKind, result: ShortcutSupportResult?, status: ShortcutSupportStatus, metadata: [String]) -> String {
         var lines = ["Windsify shortcut report (v1)", "Test: \(kind.rawValue)",
-                     "Outcome: \(result?.outcome ?? "status-only")", "Mode: safe preview; no command executed",
+                     "Outcome: \(result?.outcome ?? "status-only")", kind == .liveClaude ? "Mode: passive live check; normal shortcut processing" : "Mode: safe preview; no command executed",
                      "Edition: \(status.edition)", "Keyboard enabled: \(status.keyboardEnabled)",
                      "Keyboard service running: \(status.keyboardRunning)", "Accessibility: \(status.accessibilityGranted)",
                      "Secure input: \(status.secureInput)", "Blocked by conflict: \(status.blockedByConflict)",
@@ -169,7 +205,7 @@ final class ShortcutSupportModel: ObservableObject {
         }
         if let ruleID = result?.ruleID { lines.append("Rule: \(ruleID)") }
         if let output = result?.output { lines.append("Preview output: \(output)") }
-        lines.append("Preview context: standard text input, not a live target application")
+        lines.append(kind == .liveClaude ? "Live target: Claude; one Ctrl+C or Ctrl+V only" : "Preview context: standard text input, not a live target application")
         lines.append("No typed text, clipboard content, document titles, license keys or device serial numbers included.")
         return lines.joined(separator: "\n")
     }

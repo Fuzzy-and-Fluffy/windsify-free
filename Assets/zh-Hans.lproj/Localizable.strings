@@ -364,10 +364,35 @@
 "Terminal setup was removed. Reload the VS Code window to apply the change." = "终端配置已移除，请重新加载 VS Code 窗口以应用变更。";
 
 /* Code editor edition policy */
-"Free keeps supported code editors and AI coding apps native. Windows-style VS Code integration requires Pro." = "Free 在已识别的代码编辑器和 AI 编程应用中保留原生快捷键。Windows 风格的 VS Code 适配需要 Pro。";
+"Free uses Windows-style shortcuts in editor and chat views, and preserves native shortcuts in embedded terminals. Pro adds supported terminal integrations." = "Free 在编辑器和聊天主界面使用 Windows 风格快捷键，内置终端保留原生按键。Pro 提供已适配应用的终端增强。";
 "Setup backs up the default VS Code profile and adds removable bindings for Windsify Pro. Your ordinary VS Code shortcuts remain unchanged when Pro translation is off. Reload the VS Code window after setup or removal." = "设置会备份默认 VS Code 配置，并添加可移除的 Pro 规则。关闭 Pro 键位转换时，普通 VS Code 快捷键保持原样。配置或移除后，请重新加载 VS Code 窗口。";
 "VS Code compatibility was updated. Reload the VS Code window to apply the new edition behavior." = "VS Code 适配已更新。请重新加载 VS Code 窗口，以应用新的版本功能划分。";
 "The old Windsify VS Code block was edited. Review it manually; no configuration was changed." = "旧版 Windsify 的 VS Code 规则块已被修改。请手动检查；未更改配置。";
 "VS Code keybindings are invalid. No configuration was changed." = "VS Code 快捷键配置无效，未作任何更改。";
 "VS Code keybindings changed during cleanup. Please try again." = "清理过程中 VS Code 快捷键配置发生变化，请重试。";
 "Old VS Code shortcuts were removed. Reload the VS Code window to restore native behavior." = "旧版 VS Code 终端规则已移除。请重新加载 VS Code 窗口以恢复原生快捷键。";
+
+/* Codex Pro shortcut reference */
+"Codex and Claude conversation views use all standard Windsify Pro shortcuts, including Ctrl+A, Ctrl+C/V, text navigation and screenshots. Only the integrated terminal uses terminal-specific mappings." = "Codex 和 Claude 聊天界面使用 Windsify Pro 的整套通用快捷键，包括 Ctrl+A 全选、Ctrl+C/V 复制粘贴、文本导航及截图。只有内置终端使用专门的终端映射。";
+"Codex and Claude shortcuts (Pro)" = "Codex / Claude 快捷键（Pro）";
+"Codex chat Ctrl+C / V" = "Codex 聊天区 Ctrl+C / V";
+"Codex / Claude terminal Ctrl+Shift+C" = "Codex / Claude 终端 Ctrl+Shift+C";
+"Copy selection" = "复制选中文字";
+"Codex / Claude terminal Ctrl+V / Ctrl+Shift+V" = "Codex / Claude 终端 Ctrl+V / Ctrl+Shift+V";
+"Codex / Claude terminal Ctrl+C" = "Codex / Claude 终端 Ctrl+C";
+"Interrupt; use Ctrl+Shift+C to copy" = "中断；复制请用 Ctrl+Shift+C";
+"Both editions keep Windows-style shortcuts in confirmed main views. Free preserves native terminal keys; Pro adds terminal clipboard shortcuts. Unknown focus preserves input keys." = "两个版本在确认的主界面均保留各自的 Windows 风格映射。Free 在终端原生放行，Pro 增加终端复制粘贴适配。无法识别焦点时保留原生输入。";
+
+"Claude copy/paste (live check)" = "Claude 复制粘贴（实际按键检查）";
+
+"Claude shortcut captured" = "已捕获 Claude 的实际快捷键";
+
+"No Claude shortcut captured" = "未捕获到 Claude 快捷键";
+
+"This is the real keyboard service decision. Normal shortcut processing was left unchanged; no text or clipboard content was collected." = "这是实际键盘引擎做出的决定。诊断没有干预快捷键的正常处理流程；没有收集正文或剪贴板内容。";
+
+"No matching Ctrl+C or Ctrl+V decision reached this check within 60 seconds. This does not prove the keyboard sent nothing." = "60 秒内没有收到匹配的 Ctrl+C 或 Ctrl+V 处理结果。这不代表键盘没有发送按键。";
+
+"Switch to Claude and press Ctrl+C or Ctrl+V once. Return here for the result. The check stops after one shortcut or 60 seconds." = "切换到 Claude，按一次 Ctrl+C 或 Ctrl+V，然后返回这里查看结果。检查在捕获一次快捷键后或 60 秒后停止。";
+
+"Live check: your shortcut runs normally. Only one Claude Ctrl+C or Ctrl+V decision is kept in memory. No text, selection or clipboard content is collected." = "实际按键检查：快捷键照常执行。内存中只保留一次 Claude Ctrl+C 或 Ctrl+V 的处理结果，不收集正文、选区或剪贴板内容。";
