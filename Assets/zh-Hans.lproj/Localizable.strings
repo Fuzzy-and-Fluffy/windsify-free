@@ -364,7 +364,7 @@
 "Terminal setup was removed. Reload the VS Code window to apply the change." = "终端配置已移除，请重新加载 VS Code 窗口以应用变更。";
 
 /* Code editor edition policy */
-"Free uses Windows-style shortcuts in editor and chat views, and preserves native shortcuts in embedded terminals. Pro adds supported terminal integrations." = "Free 在编辑器和聊天主界面使用 Windows 风格快捷键，内置终端保留原生按键。Pro 提供已适配应用的终端增强。";
+"Free uses generic Windows shortcuts throughout editors, including embedded terminals. Ctrl+C becomes copy there, not interrupt. Pro adds pane-aware terminal support. Standalone terminal apps keep native Control shortcuts." = "Free 在整个编辑器中使用通用 Windows 快捷键，包括内置终端；此处 Ctrl+C 用于复制，不用于中断。Pro 提供按焦点区分的终端适配。独立终端应用保留原生 Control 快捷键。";
 "Setup backs up the default VS Code profile and adds removable bindings for Windsify Pro. Your ordinary VS Code shortcuts remain unchanged when Pro translation is off. Reload the VS Code window after setup or removal." = "设置会备份默认 VS Code 配置，并添加可移除的 Pro 规则。关闭 Pro 键位转换时，普通 VS Code 快捷键保持原样。配置或移除后，请重新加载 VS Code 窗口。";
 "VS Code compatibility was updated. Reload the VS Code window to apply the new edition behavior." = "VS Code 适配已更新。请重新加载 VS Code 窗口，以应用新的版本功能划分。";
 "The old Windsify VS Code block was edited. Review it manually; no configuration was changed." = "旧版 Windsify 的 VS Code 规则块已被修改。请手动检查；未更改配置。";
@@ -381,7 +381,7 @@
 "Codex / Claude terminal Ctrl+V / Ctrl+Shift+V" = "Codex / Claude 终端 Ctrl+V / Ctrl+Shift+V";
 "Codex / Claude terminal Ctrl+C" = "Codex / Claude 终端 Ctrl+C";
 "Interrupt; use Ctrl+Shift+C to copy" = "中断；复制请用 Ctrl+Shift+C";
-"Both editions keep Windows-style shortcuts in confirmed main views. Free preserves native terminal keys; Pro adds terminal clipboard shortcuts. Unknown focus preserves input keys." = "两个版本在确认的主界面均保留各自的 Windows 风格映射。Free 在终端原生放行，Pro 增加终端复制粘贴适配。无法识别焦点时保留原生输入。";
+"Free uses generic Windows shortcuts throughout editors without detecting terminal panes. Pro distinguishes main views from supported terminals. In Free embedded terminals, Ctrl+C becomes copy; standalone terminal apps keep native Control shortcuts." = "Free 在整个编辑器中使用通用 Windows 快捷键，不识别终端区域。Pro 区分主界面与已支持的终端。Free 内置终端中的 Ctrl+C 用于复制；独立终端保留原生 Control 快捷键。";
 
 "Claude copy/paste (live check)" = "Claude 复制粘贴（实际按键检查）";
 

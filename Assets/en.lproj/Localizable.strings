@@ -364,7 +364,7 @@
 "Terminal setup was removed. Reload the VS Code window to apply the change." = "Terminal setup was removed. Reload the VS Code window to apply the change.";
 
 /* Code editor edition policy */
-"Free uses Windows-style shortcuts in editor and chat views, and preserves native shortcuts in embedded terminals. Pro adds supported terminal integrations." = "Free uses Windows-style shortcuts in editor and chat views, and preserves native shortcuts in embedded terminals. Pro adds supported terminal integrations.";
+"Free uses generic Windows shortcuts throughout editors, including embedded terminals. Ctrl+C becomes copy there, not interrupt. Pro adds pane-aware terminal support. Standalone terminal apps keep native Control shortcuts." = "Free uses generic Windows shortcuts throughout editors, including embedded terminals. Ctrl+C becomes copy there, not interrupt. Pro adds pane-aware terminal support. Standalone terminal apps keep native Control shortcuts.";
 "Setup backs up the default VS Code profile and adds removable bindings for Windsify Pro. Your ordinary VS Code shortcuts remain unchanged when Pro translation is off. Reload the VS Code window after setup or removal." = "Setup backs up the default VS Code profile and adds removable bindings for Windsify Pro. Your ordinary VS Code shortcuts remain unchanged when Pro translation is off. Reload the VS Code window after setup or removal.";
 "VS Code compatibility was updated. Reload the VS Code window to apply the new edition behavior." = "VS Code compatibility was updated. Reload the VS Code window to apply the new edition behavior.";
 "The old Windsify VS Code block was edited. Review it manually; no configuration was changed." = "The old Windsify VS Code block was edited. Review it manually; no configuration was changed.";
@@ -381,7 +381,7 @@
 "Codex / Claude terminal Ctrl+V / Ctrl+Shift+V" = "Codex / Claude terminal Ctrl+V / Ctrl+Shift+V";
 "Codex / Claude terminal Ctrl+C" = "Codex / Claude terminal Ctrl+C";
 "Interrupt; use Ctrl+Shift+C to copy" = "Interrupt; use Ctrl+Shift+C to copy";
-"Both editions keep Windows-style shortcuts in confirmed main views. Free preserves native terminal keys; Pro adds terminal clipboard shortcuts. Unknown focus preserves input keys." = "Both editions keep Windows-style shortcuts in confirmed main views. Free preserves native terminal keys; Pro adds terminal clipboard shortcuts. Unknown focus preserves input keys.";
+"Free uses generic Windows shortcuts throughout editors without detecting terminal panes. Pro distinguishes main views from supported terminals. In Free embedded terminals, Ctrl+C becomes copy; standalone terminal apps keep native Control shortcuts." = "Free uses generic Windows shortcuts throughout editors without detecting terminal panes. Pro distinguishes main views from supported terminals. In Free embedded terminals, Ctrl+C becomes copy; standalone terminal apps keep native Control shortcuts.";
 
 "Claude copy/paste (live check)" = "Claude copy/paste (live check)";
 

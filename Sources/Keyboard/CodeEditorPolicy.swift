@@ -30,9 +30,4 @@ enum CodeEditorPolicy {
             (context.isTextInput || context.editorInputContext == .textInput)
     }
 
-    static func resolveContext(_ bundleIdentifier: String?, processIdentifier: Int32) -> MappingContext? {
-        guard contains(bundleIdentifier) else { return nil }
-        return context(bundleIdentifier: bundleIdentifier,
-                       focus: EditorAccessibilityFocus.resolve(processIdentifier: processIdentifier))
-    }
 }

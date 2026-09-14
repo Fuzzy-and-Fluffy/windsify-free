@@ -21,10 +21,11 @@ protocol KeyboardMappingEvaluating: Sendable {
 }
 
 extension KeyboardMappingEvaluating {
-    func preservesCodeEditorKeyboard(bundleIdentifier: String?) -> Bool { CodeEditorPolicy.contains(bundleIdentifier) }
+    func preservesCodeEditorKeyboard(bundleIdentifier: String?) -> Bool { false }
 
     func codeEditorContext(bundleIdentifier: String?, processIdentifier: Int32) -> MappingContext? {
-        CodeEditorPolicy.resolveContext(bundleIdentifier, processIdentifier: processIdentifier)
+        // The Free/default policy never queries editor pane structure.
+        nil
     }
 
     func evaluate(_ stroke: KeyboardStroke) -> RuleDecision {

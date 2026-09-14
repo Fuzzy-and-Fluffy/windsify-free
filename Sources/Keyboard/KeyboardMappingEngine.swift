@@ -84,11 +84,9 @@ struct KeyboardMappingEngine: KeyboardMappingEvaluating, Sendable {
         if isRemoteDesktop(context) {
             return passThrough(ruleID: "native.remote-desktop")
         }
-        // Both tiers retain ordinary Windows mappings in confirmed main views.
-        // Free adds no terminal actions: terminal and unknown focus stay native.
-        if CodeEditorPolicy.contains(context.bundleIdentifier), !CodeEditorPolicy.isMainView(context) {
-            return passThrough(ruleID: "native.editor-terminal-or-unknown")
-        }
+        // Free uses generic mappings throughout editors, including embedded
+        // terminals. Pane-aware terminal handling belongs to Pro. Standalone
+        // terminal apps retain the bundle-based Control safety below.
 
         if stroke.keyCode == MacKeyCode.space,
            stroke.modifiers == [.control] {
@@ -353,8 +351,7 @@ struct KeyboardMappingEngine: KeyboardMappingEvaluating, Sendable {
     }
 
     func permitsHostShortcut(in context: MappingContext) -> Bool {
-        !context.isSecureInput && !context.keyboardMappingExcluded && !isRemoteDesktop(context) &&
-            (!CodeEditorPolicy.contains(context.bundleIdentifier) || CodeEditorPolicy.isMainView(context))
+        !context.isSecureInput && !context.keyboardMappingExcluded && !isRemoteDesktop(context)
     }
 
     private func isTerminal(_ context: MappingContext) -> Bool {
