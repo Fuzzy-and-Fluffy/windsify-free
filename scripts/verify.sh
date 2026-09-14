@@ -8,8 +8,10 @@ if [[ ! -f "$PROJECT_SPEC" ]]; then
   PROJECT_SPEC="$PROJECT_DIR/project.yml"
 fi
 
-PROJECT_GENERATION_DIR=$(mktemp -d /private/tmp/windsify-free-project.XXXXXX)
-DERIVED_DATA=$(mktemp -d /private/tmp/windsify-free-derived.XXXXXX)
+VERIFY_ROOT=${WINDSIFY_VERIFY_ROOT:-/private/tmp}
+mkdir -p "$VERIFY_ROOT"
+PROJECT_GENERATION_DIR=$(mktemp -d "$VERIFY_ROOT/windsify-free-project.XXXXXX")
+DERIVED_DATA=$(mktemp -d "$VERIFY_ROOT/windsify-free-derived.XXXXXX")
 
 cleanup() {
   [[ ! -d "$PROJECT_GENERATION_DIR" ]] || /bin/rm -R "$PROJECT_GENERATION_DIR"

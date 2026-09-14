@@ -34,15 +34,21 @@ struct MappingContext: Equatable, Sendable {
     let bundleIdentifier: String?
     let isTextInput: Bool
     let isSecureInput: Bool
+    let vscodeInputContext: VSCodeInputContext
+    let keyboardMappingExcluded: Bool
 
     init(
         bundleIdentifier: String? = nil,
         isTextInput: Bool = false,
-        isSecureInput: Bool = false
+        isSecureInput: Bool = false,
+        vscodeInputContext: VSCodeInputContext = .unknown,
+        keyboardMappingExcluded: Bool = false
     ) {
         self.bundleIdentifier = bundleIdentifier
         self.isTextInput = isTextInput
         self.isSecureInput = isSecureInput
+        self.vscodeInputContext = vscodeInputContext
+        self.keyboardMappingExcluded = keyboardMappingExcluded
     }
 }
 

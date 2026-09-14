@@ -132,9 +132,11 @@ final class CGEventTapController {
 
     private var eventTap: CFMachPort?
     private var runLoopSource: CFRunLoopSource?
+    private var focusWarmupObserver: NSObjectProtocol?
     private var windowsKeyTapTracker = WindowsKeyTapTracker()
     private var replacementTransactions =
         KeyboardReplacementTransactionStore()
+    private var nativeTransactions = NativeKeyboardTransactionStore()
 
     /// The event tap remains useful for keyboard translation when window
     /// management is disabled. In that state, physical Win window shortcuts
@@ -235,9 +237,26 @@ final class CGEventTapController {
             .commonModes
         )
         CGEvent.tapEnable(tap: newEventTap, enable: true)
+        // Warm Electron's AX connection on app activation, outside key handling.
+        // This stores no focus result: every mapped press still checks fresh focus.
+        focusWarmupObserver = NSWorkspace.shared.notificationCenter.addObserver(
+            forName: NSWorkspace.didActivateApplicationNotification,
+            object: nil, queue: .main
+        ) { notification in
+            guard !IsSecureEventInputEnabled(),
+                  !UserDefaults.standard.bool(forKey: VSCodeKeyboardPolicy.nativeShortcutsPreference),
+                  let app = notification.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication,
+                  VSCodeFocusClassifier.supports(bundleIdentifier: app.bundleIdentifier) else { return }
+            _ = VSCodeAccessibilityFocus.resolve(processIdentifier: app.processIdentifier)
+        }
     }
 
     func stop() {
+        if let focusWarmupObserver {
+            NSWorkspace.shared.notificationCenter.removeObserver(focusWarmupObserver)
+            self.focusWarmupObserver = nil
+        }
+        nativeTransactions = NativeKeyboardTransactionStore()
         let releases = replacementTransactions.releaseAll()
         if let events = Self.emergencyReleaseEvents(for: releases) {
             for event in events {
@@ -318,6 +337,10 @@ final class CGEventTapController {
         let physicalStroke = (type == .keyDown || type == .keyUp)
             ? KeyboardStroke(keyCode: rawKeyCode, phase: stroke.phase, modifiers: stroke.modifiers)
             : stroke
+
+        if nativeTransactions.continues(physicalStroke, isRepeat: event.getIntegerValueField(.keyboardEventAutorepeat) != 0) {
+            return Unmanaged.passUnretained(event)
+        }
 
         if event.getIntegerValueField(.keyboardEventAutorepeat) != 0,
            let replacements = replacementTransactions
@@ -409,6 +432,9 @@ final class CGEventTapController {
 
         switch decision.action {
         case .passThrough:
+            if type == .keyDown {
+                nativeTransactions.begin(rawKeyCode)
+            }
             if type == Self.systemDefinedEventType,
                decision.ruleID == "native.unmapped" {
                 guard let events = syntheticEventFactory.events(
@@ -831,13 +857,25 @@ final class CGEventTapController {
     }
 
     private static func frontmostContext() -> MappingContext {
-        MappingContext(
-            bundleIdentifier: NSWorkspace.shared
-                .frontmostApplication?
-                .bundleIdentifier,
-            isTextInput: focusedElementIsTextInput(),
-            isSecureInput: IsSecureEventInputEnabled()
-        )
+        let app = NSWorkspace.shared.frontmostApplication
+        let secure = IsSecureEventInputEnabled()
+        if VSCodeFocusClassifier.supports(bundleIdentifier: app?.bundleIdentifier) {
+            let excluded = UserDefaults.standard.bool(forKey: VSCodeKeyboardPolicy.nativeShortcutsPreference)
+            let focus = !secure && !excluded ? app.map {
+                VSCodeAccessibilityFocus.resolve(processIdentifier: $0.processIdentifier)
+            } ?? .unknown : .unknown
+            guard NSWorkspace.shared.frontmostApplication?.processIdentifier == app?.processIdentifier else {
+                return MappingContext(keyboardMappingExcluded: true)
+            }
+            return MappingContext(bundleIdentifier: app?.bundleIdentifier,
+                                  isTextInput: focus == .textInput,
+                                  isSecureInput: secure,
+                                  vscodeInputContext: focus,
+                                  keyboardMappingExcluded: excluded)
+        }
+        return MappingContext(bundleIdentifier: app?.bundleIdentifier,
+                              isTextInput: !secure && focusedElementIsTextInput(),
+                              isSecureInput: secure)
     }
 
     private static func focusedElementIsTextInput() -> Bool {

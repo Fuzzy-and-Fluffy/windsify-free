@@ -341,3 +341,24 @@
 
 "Continue / 继续" = "Continue / 继续";
 "Language / 语言" = "Language / 语言";
+
+/* VS Code terminal compatibility */
+"Use native keyboard shortcuts in VS Code" = "在 VS Code 中使用原生快捷键";
+"Windsify leaves VS Code keyboard shortcuts unchanged." = "Windsify 不修改 VS Code 的键盘快捷键。";
+"VS Code: Ctrl+C copies in the editor and stays native in the terminal. Use Ctrl+Shift+C/V to copy/paste in the terminal. If focus cannot be identified, Control shortcuts pass through unchanged." = "VS Code：Ctrl+C 在编辑器中复制，在终端中保留原生行为。终端复制和粘贴使用 Ctrl+Shift+C/V。无法识别输入焦点时，Control 快捷键将原样传递。";
+"Custom VS Code keybindings can change these actions. Remove any older terminal Cmd+C/V remapping before using automatic handling." = "自定义 VS Code 键位可能改变这些操作。使用自动识别前，请移除旧的终端 Cmd+C/V 重映射配置。";
+
+/* VS Code Windows terminal setup */
+"VS Code: Windows shortcuts in the editor; terminal Control keys are handled by VS Code." = "VS Code：编辑器使用 Windows 快捷键，终端的 Control 按键由 VS Code 处理。";
+"Set up Windows terminal shortcuts: Ctrl+C copies and clears a selection, or interrupts when nothing is selected. Ctrl+V pastes. Ctrl+Shift+C/V also work." = "配置 Windows 终端快捷键：Ctrl+C 在有选区时复制并清除选区，没有选区时中断。Ctrl+V 粘贴，也支持 Ctrl+Shift+C/V。";
+"Setup adds a removable block to the default VS Code profile and backs up the original file. It overrides older terminal copy/paste bindings while installed, including Cmd+C/V. These VS Code bindings remain active when Windsify is off." = "设置会备份原文件，并向默认 VS Code 配置添加可移除的规则块。它会优先于旧的终端复制粘贴绑定（包括 Cmd+C/V）生效。关闭 Windsify 后，这些 VS Code 规则仍然有效。";
+"Set up VS Code terminal" = "配置 VS Code 终端";
+"Remove terminal setup" = "移除终端配置";
+"VS Code terminal shortcuts are ready." = "VS Code 终端快捷键已就绪。";
+"Windsify's VS Code terminal setup was removed." = "已移除 Windsify 添加的 VS Code 终端配置。";
+"VS Code keybindings must be a valid JSONC array. No changes were made." = "VS Code 快捷键文件必须是有效的 JSONC 数组，未作任何修改。";
+"The Windsify settings block was edited. Review it in VS Code before changing setup." = "Windsify 规则块已被编辑，请先在 VS Code 中检查。";
+"Open the default VS Code profile once before setting up terminal shortcuts." = "请先打开一次 VS Code 默认配置，再设置终端快捷键。";
+"VS Code keybindings changed during setup. Please try again." = "设置过程中 VS Code 快捷键文件发生变化，请重试。";
+"VS Code terminal shortcuts are installed. Reload the VS Code window to apply them." = "终端快捷键已安装，请重新加载 VS Code 窗口以应用配置。";
+"Terminal setup was removed. Reload the VS Code window to apply the change." = "终端配置已移除，请重新加载 VS Code 窗口以应用变更。";
