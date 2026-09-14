@@ -35,20 +35,20 @@ macOS does not expose the standard Windows Menu key through that event tap, a
 non-seizing HID listener additionally accepts only its standard `0x65` usage.
 The app does not record typed text or use a kernel or DriverKit extension.
 
-Both editions use their ordinary Windows-style mappings in confirmed editor
-and chat main views. Only the embedded terminal receives per-app treatment:
-Free preserves native terminal keys; Pro adds supported terminal integrations.
-Shared local Accessibility discovery reads roles and structural classes only,
-never typed, terminal, selected or clipboard text. Unknown focus preserves input.
+Free uses generic Windows-style mappings throughout code editors and AI chat
+apps, including their embedded terminals, without discovering pane focus.
+Ctrl+C becomes Command+C in these embedded terminals and is not an interrupt;
+temporarily disable translation or use a standalone terminal when native shell
+Control input is needed. Recognized standalone terminal apps retain native
+Control sequences, as do secure input and remote sessions.
 
-Pro's stable VS Code setup provides selection-aware Ctrl+C copy/interrupt and
-Windows-style paste. Use **Set up VS Code terminal**, then **Developer: Reload
-Window**. Setup backs up the default profile and adds removable Pro bridge
-bindings; Free does not emit those bridge chords. Codex and Claude use explicit
-Pro terminal copy/paste chords and retain Ctrl+C interrupt. Other registered
-editors use ordinary mappings when main focus is confirmed, with native
-terminal input until a terminal adapter is supported. Exact app identities are
-registered; this is not automatic detection of every possible editor.
+Pro retains ordinary Windows mappings in confirmed main views and uses supported
+terminal adapters. Its VS Code setup enables selection-aware Ctrl+C copy/interrupt
+and Ctrl+V paste; choose Set up VS Code terminal, then Developer: Reload Window.
+Codex and Claude Pro terminals use explicit copy/paste chords and keep Ctrl+C
+interrupt. Pro preserves native text input when pane focus is unknown.
+Pane detection and terminal adapters are private Pro implementation and are not
+included in the public Free source.
 
 
 ## Shortcut Help
