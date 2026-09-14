@@ -19,6 +19,7 @@ final class FreeAppState: ObservableObject {
     @Published private(set) var conflicts: [ConflictFinding] = []
     @Published private(set) var launchAtLoginEnabled: Bool
     @Published private(set) var lastErrorMessage: String?
+    @Published private(set) var codeEditorMigrationMessage: String?
     let shortcutSupport = ShortcutSupportModel()
 
     private let keyboardController: CGEventTapController
@@ -82,6 +83,13 @@ final class FreeAppState: ObservableObject {
             return
         }
         hasActivated = true
+        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
+            do {
+                if try VSCodeLegacyCleanup.remove() {
+                    codeEditorMigrationMessage = "Old VS Code shortcuts were removed. Reload the VS Code window to restore native behavior."
+                }
+            } catch { codeEditorMigrationMessage = error.localizedDescription }
+        }
         refresh()
     }
 

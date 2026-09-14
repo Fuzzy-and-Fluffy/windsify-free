@@ -13,10 +13,20 @@ protocol KeyboardMappingEvaluating: Sendable {
         for stroke: KeyboardStroke
     ) -> RuleDecision?
 
+    func preservesCodeEditorKeyboard(bundleIdentifier: String?) -> Bool
+
+    func codeEditorContext(bundleIdentifier: String?, processIdentifier: Int32) -> MappingContext?
+
     func permitsHostShortcut(in context: MappingContext) -> Bool
 }
 
 extension KeyboardMappingEvaluating {
+    func preservesCodeEditorKeyboard(bundleIdentifier: String?) -> Bool { CodeEditorPolicy.contains(bundleIdentifier) }
+
+    func codeEditorContext(bundleIdentifier: String?, processIdentifier: Int32) -> MappingContext? {
+        CodeEditorPolicy.nativeContext(bundleIdentifier)
+    }
+
     func evaluate(_ stroke: KeyboardStroke) -> RuleDecision {
         evaluate(stroke, context: MappingContext())
     }
