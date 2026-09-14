@@ -57,6 +57,12 @@ final class FreeAppState: ObservableObject {
         keyboardController.shortcutTestHandler = { [weak shortcutSupport] type, event in
             MainActor.assumeIsolated { shortcutSupport?.intercept(type: type, event: event) }
         }
+        keyboardController.shortcutDecisionObserver = { [weak shortcutSupport] event, stroke, context, decision, milliseconds in
+            MainActor.assumeIsolated {
+                shortcutSupport?.observeLive(event: event, stroke: stroke, context: context,
+                                             decision: decision, contextMilliseconds: milliseconds)
+            }
+        }
         shortcutSupport.statusProvider = { [weak self] in
             guard let self else { return ShortcutSupportStatus() }
             return ShortcutSupportStatus(keyboardEnabled: self.keyboardTranslationEnabled,
@@ -78,12 +84,13 @@ final class FreeAppState: ObservableObject {
     }
 
     func activate() {
+        guard !InputRuntimeSafety.isTestHost else { return }
         guard !hasActivated else {
             refresh()
             return
         }
         hasActivated = true
-        if ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] == nil {
+        if !InputRuntimeSafety.isTestHost {
             do {
                 if try VSCodeLegacyCleanup.remove() {
                     codeEditorMigrationMessage = "Old VS Code shortcuts were removed. Reload the VS Code window to restore native behavior."

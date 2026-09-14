@@ -146,6 +146,8 @@ final class CGEventTapController {
     /// Explicit, short-lived support preview. nil leaves normal processing
     /// untouched; false bypasses mapping; true consumes the test event.
     var shortcutTestHandler: ((CGEventType, CGEvent) -> Bool?)?
+    /// Passive observer for an explicitly armed, single-shortcut support check.
+    var shortcutDecisionObserver: ((CGEvent, KeyboardStroke, MappingContext, RuleDecision, Double) -> Void)?
 
     var isRunning: Bool {
         eventTap != nil
@@ -179,6 +181,7 @@ final class CGEventTapController {
     }
 
     func start() throws {
+        try InputRuntimeSafety.requireInteractiveInput()
         guard Thread.isMainThread else {
             throw CGEventTapControllerError.mustStartOnMainThread
         }
@@ -256,7 +259,7 @@ final class CGEventTapController {
         }
         nativeTransactions = NativeKeyboardTransactionStore()
         let releases = replacementTransactions.releaseAll()
-        if let events = Self.emergencyReleaseEvents(for: releases) {
+        if !InputRuntimeSafety.isTestHost, let events = Self.emergencyReleaseEvents(for: releases) {
             for event in events {
                 event.post(tap: .cgSessionEventTap)
             }
@@ -407,11 +410,14 @@ final class CGEventTapController {
             return Unmanaged.passUnretained(event)
         }
 
+        let contextStarted = ProcessInfo.processInfo.systemUptime
         let context = contextProvider()
         let decision = engine.evaluate(
             stroke,
             context: context
         )
+        shortcutDecisionObserver?(event, stroke, context, decision,
+                                  (ProcessInfo.processInfo.systemUptime - contextStarted) * 1_000)
         let accessibilityTextNavigationHandled =
             moveNativeSingleLineCaretIfSupported(
                 for: decision,
@@ -582,6 +588,7 @@ final class CGEventTapController {
             strokes: releases,
             makeEvents: Self.emergencyReleaseEvents,
             publish: { events in
+                guard !InputRuntimeSafety.isTestHost else { return }
                 for event in events {
                     event.post(tap: .cgSessionEventTap)
                 }
@@ -598,6 +605,7 @@ final class CGEventTapController {
         _ events: [CGEvent],
         proxy: CGEventTapProxy
     ) {
+        guard !InputRuntimeSafety.isTestHost else { return }
         for event in events {
             event.tapPostEvent(proxy)
         }
@@ -785,6 +793,17 @@ final class CGEventTapController {
             .maskNonCoalesced,
         ]
         var flags = targetShape.subtracting(shortcutModifierFlags)
+        // Physical events also carry left/right device bits (IOLLEvent.h).
+        // Clearing only maskControl left NX_DEVICELCTLKEYMASK set on the
+        // captured Claude Ctrl+C event: 0x40101 became contradictory 0x100101.
+        // Retain side information only for modifier families still requested.
+        let deviceModifierBits: [(KeyModifier, UInt64)] = [
+            (.control, 0x00002001), (.shift, 0x00000006),
+            (.command, 0x00000018), (.option, 0x00000060),
+        ]
+        for (modifier, bits) in deviceModifierBits where !modifiers.contains(modifier) {
+            flags.remove(CGEventFlags(rawValue: bits))
+        }
         flags.formUnion(ambient.intersection(ambientFlags))
         flags.formUnion(
             cgEventFlags(from: modifiers)
@@ -839,6 +858,7 @@ final class CGEventTapController {
     }
 
     private static func openApplication(_ bundleIdentifier: String) {
+        guard !InputRuntimeSafety.isTestHost else { return }
         guard let applicationURL = NSWorkspace.shared
             .urlForApplication(withBundleIdentifier: bundleIdentifier) else {
             return
@@ -952,6 +972,7 @@ final class CGEventTapController {
         for decision: RuleDecision,
         stroke: KeyboardStroke
     ) -> Bool {
+        guard !InputRuntimeSafety.isTestHost else { return false }
         let directRuleIDs: Set<String> = [
             "editing.home",
             "editing.end",

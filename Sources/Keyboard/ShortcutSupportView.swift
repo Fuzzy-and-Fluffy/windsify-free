@@ -23,12 +23,12 @@ struct ShortcutSupportView: View {
                     if model.isListening {
                         Label("Press your shortcut now…", systemImage: "hand.tap")
                             .font(.headline)
-                        Text("Keep this window active. The test stops after one shortcut or 10 seconds.")
+                        Text(L10n.text(model.isLiveCheck ? "Switch to Claude and press Ctrl+C or Ctrl+V once. Return here for the result. The check stops after one shortcut or 60 seconds." : "Keep this window active. The test stops after one shortcut or 10 seconds."))
                         Button("Cancel test") { model.cancel() }
                     } else {
                         Button(L10n.text(model.result == nil ? "Test shortcut" : "Test again")) { model.start() }
                             .buttonStyle(.borderedProminent)
-                        Text("Safe preview: Windsify won't run the shortcut. macOS may still handle reserved system keys. Only this test's key details are collected, not typed text.")
+                        Text(L10n.text(model.isLiveCheck ? "Live check: your shortcut runs normally. Only one Claude Ctrl+C or Ctrl+V decision is kept in memory. No text, selection or clipboard content is collected." : "Safe preview: Windsify won't run the shortcut. macOS may still handle reserved system keys. Only this test's key details are collected, not typed text."))
                             .font(.caption).foregroundStyle(.secondary)
                     }
                 }
@@ -44,8 +44,11 @@ struct ShortcutSupportView: View {
                         if let received = result.receivedShortcut {
                             LabeledContent("Your Mac received", value: L10n.text(received)).font(.callout)
                         }
-                        if let output = result.output, result.outcome == "mapping-recognized-preview-only" {
+                        if let output = result.output, result.outcome == "mapping-recognized-preview-only" || result.outcome == "live-decision-captured" {
                             LabeledContent("Windsify would send", value: L10n.message(output)).font(.callout)
+                        }
+                        if model.isLiveCheck {
+                            Text(model.report).font(.system(.caption, design: .monospaced)).textSelection(.enabled)
                         }
                     }
                 } else if let explanation = model.status.explanation {

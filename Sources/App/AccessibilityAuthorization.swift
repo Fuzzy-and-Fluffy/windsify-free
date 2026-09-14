@@ -19,6 +19,7 @@ struct SystemAccessibilityAuthorizer: AccessibilityAuthorizing {
     }
 
     func requestAccess() {
+        guard !InputRuntimeSafety.isTestHost else { return }
         let promptKey = kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String
         let options = [promptKey: true] as CFDictionary
         let isTrusted = AXIsProcessTrustedWithOptions(options)

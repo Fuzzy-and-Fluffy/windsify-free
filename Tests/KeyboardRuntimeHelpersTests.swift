@@ -762,6 +762,34 @@ final class KeyboardRuntimeHelpersTests: XCTestCase {
         XCTAssertTrue(flags.contains(.maskSecondaryFn))
     }
 
+    func testRealClaudeControlCFlagsLoseBothAggregateAndPhysicalControl() {
+        for key in [MacKeyCode.a, MacKeyCode.c, MacKeyCode.v] {
+            for down in [true, false] {
+                let event = CGEvent(keyboardEventSource: CGEventSource(stateID: .privateState),
+                                    virtualKey: key, keyDown: down)!
+                // Exact input flags from the user's opt-in live Ctrl+C check.
+                event.flags = CGEventFlags(rawValue: 262401)
+                XCTAssertTrue(CGEventTapController.rewrite(event, ofType: down ? .keyDown : .keyUp,
+                    with: .init(keyCode: key, phase: down ? .down : .up, modifiers: [.command])))
+                XCTAssertEqual(event.flags.rawValue, 0x00100100)
+                XCTAssertEqual(event.flags.rawValue & 0x00002001, 0)
+                XCTAssertTrue(event.flags.contains(.maskCommand))
+            }
+        }
+    }
+
+    func testModifierCompositionDropsRemovedSidesAndKeepsRequestedSidesAndKeyShape() {
+        let families: [(KeyModifier, UInt64)] = [(.control, 0x2001), (.shift, 0x6), (.command, 0x18), (.option, 0x60)]
+        let sides = families.reduce(UInt64(0)) { $0 | $1.1 }
+        let shape: CGEventFlags = [.maskAlphaShift, .maskNonCoalesced, .maskSecondaryFn, .maskNumericPad]
+        for (modifier, retained) in families {
+            let result = CGEventTapController.composedFlags(
+                targetShape: CGEventFlags(rawValue: sides).union(shape), ambient: [], modifiers: [modifier])
+            XCTAssertEqual(result.rawValue & sides, retained)
+            XCTAssertEqual(result.intersection(shape), shape)
+        }
+    }
+
     #if DEBUG
     func testHomeEndDiagnosticsPersistOnlyKeyCodeAndRuleIdentifier() {
         let suiteName = "app.windsify.tests.keyboard-focus-diagnostics."

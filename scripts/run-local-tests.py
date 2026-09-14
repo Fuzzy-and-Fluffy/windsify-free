@@ -74,6 +74,8 @@ def validate_manifest(configuration, expected_id, runtime_products):
     if not targets:
         raise ValueError("XCTest manifest has no test targets")
     for target in targets:
+        if target.get("EnvironmentVariables", {}).get("WINDSIFY_UNIT_TEST_HOST") != "1":
+            raise ValueError("XCTest host lacks the explicit input-isolation environment marker")
         if target.get("TestHostBundleIdentifier") != expected_id:
             raise ValueError("XCTest manifest selects a different application identity")
         if target.get("TestHostPath") != "__TESTROOT__/Debug/WindsifyMac.app":

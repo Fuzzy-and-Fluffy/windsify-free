@@ -84,6 +84,7 @@ enum AccessibilityContextMenuTargetResolver {
 
 enum AccessibilityContextMenuController {
     static func showForFocusedElement() -> Bool {
+        guard !InputRuntimeSafety.isTestHost else { return false }
         let systemWideElement = AXUIElementCreateSystemWide()
         guard let resolution = AccessibilityFocusResolver.resolve(
             systemWideElement: systemWideElement,
@@ -221,6 +222,7 @@ final class ApplicationMenuKeyController {
     }
 
     func start() throws {
+        try InputRuntimeSafety.requireInteractiveInput()
         guard manager == nil else {
             return
         }

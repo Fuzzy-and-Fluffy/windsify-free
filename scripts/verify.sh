@@ -10,6 +10,7 @@ fi
 
 VERIFY_ROOT=${WINDSIFY_VERIFY_ROOT:-/private/tmp}
 mkdir -p "$VERIFY_ROOT"
+python3 "$PROJECT_DIR/scripts/check-input-test-isolation.py"
 PROJECT_GENERATION_DIR=$(mktemp -d "$VERIFY_ROOT/windsify-free-project.XXXXXX")
 DERIVED_DATA=$(mktemp -d "$VERIFY_ROOT/windsify-free-derived.XXXXXX")
 

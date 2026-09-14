@@ -34,23 +34,26 @@ struct MappingContext: Equatable, Sendable {
     let bundleIdentifier: String?
     let isTextInput: Bool
     let isSecureInput: Bool
+    let isEmbeddedTerminal: Bool
     let vscodeTerminalBridgeEnabled: Bool
-    let vscodeInputContext: VSCodeInputContext
+    let editorInputContext: EditorInputContext
     let keyboardMappingExcluded: Bool
 
     init(
         bundleIdentifier: String? = nil,
         isTextInput: Bool = false,
         isSecureInput: Bool = false,
-        vscodeInputContext: VSCodeInputContext = .unknown,
+        isEmbeddedTerminal: Bool = false,
+        editorInputContext: EditorInputContext = .unknown,
         vscodeTerminalBridgeEnabled: Bool = false,
         keyboardMappingExcluded: Bool = false
     ) {
         self.bundleIdentifier = bundleIdentifier
         self.isTextInput = isTextInput
         self.isSecureInput = isSecureInput
+        self.isEmbeddedTerminal = isEmbeddedTerminal
         self.vscodeTerminalBridgeEnabled = vscodeTerminalBridgeEnabled
-        self.vscodeInputContext = vscodeInputContext
+        self.editorInputContext = editorInputContext
         self.keyboardMappingExcluded = keyboardMappingExcluded
     }
 }
