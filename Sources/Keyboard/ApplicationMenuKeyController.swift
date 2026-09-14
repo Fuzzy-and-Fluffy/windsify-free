@@ -200,6 +200,7 @@ enum AccessibilityContextMenuController {
 final class ApplicationMenuKeyController {
     typealias ShowMenuHandler = () -> Bool
 
+    var permitsApplication: (String?) -> Bool = { !CodeEditorPolicy.contains($0) }
     private let showMenu: ShowMenuHandler
     private var manager: IOHIDManager?
     private var pressTracker = ApplicationMenuKeyPressTracker()
@@ -308,6 +309,11 @@ final class ApplicationMenuKeyController {
         usage: UInt32,
         integerValue: CFIndex
     ) {
+        guard permitsApplication(NSWorkspace.shared.frontmostApplication?.bundleIdentifier) else {
+            pressTracker = ApplicationMenuKeyPressTracker()
+            return
+        }
+
         guard ApplicationMenuKeyHIDFilter.matches(
             usagePage: usagePage,
             usage: usage

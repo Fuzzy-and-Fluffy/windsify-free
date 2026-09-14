@@ -78,15 +78,11 @@ struct KeyboardMappingEngine: KeyboardMappingEvaluating, Sendable {
             return passThrough(ruleID: "native.secure-input")
         }
 
-        if context.keyboardMappingExcluded {
+        if context.keyboardMappingExcluded || CodeEditorPolicy.contains(context.bundleIdentifier) {
             return passThrough(ruleID: "native.application-excluded")
         }
         if isRemoteDesktop(context) {
             return passThrough(ruleID: "native.remote-desktop")
-        }
-
-        if let decision = VSCodeKeyboardPolicy.decision(for: stroke, context: context) {
-            return decision
         }
 
         if stroke.keyCode == MacKeyCode.space,
@@ -352,7 +348,7 @@ struct KeyboardMappingEngine: KeyboardMappingEvaluating, Sendable {
     }
 
     func permitsHostShortcut(in context: MappingContext) -> Bool {
-        !context.isSecureInput && !context.keyboardMappingExcluded && !isRemoteDesktop(context)
+        !context.isSecureInput && !context.keyboardMappingExcluded && !CodeEditorPolicy.contains(context.bundleIdentifier) && !isRemoteDesktop(context)
     }
 
     private func isTerminal(_ context: MappingContext) -> Bool {

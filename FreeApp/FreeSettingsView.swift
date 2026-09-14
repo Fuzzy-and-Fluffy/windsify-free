@@ -8,7 +8,9 @@ struct FreeSettingsView: View {
         Form {
             LanguageSettingsSection()
             Section("Windows keyboard essentials") {
-                VSCodeCompatibilityView()
+                if let message = appState.codeEditorMigrationMessage { Text(L10n.text(message)) }
+                Text(L10n.text("Free keeps supported code editors and AI coding apps native. Windows-style VS Code integration requires Pro."))
+                    .font(.caption)
                 Toggle(
                     "Enable Windows keyboard shortcuts",
                     isOn: Binding(

@@ -362,3 +362,12 @@
 "VS Code keybindings changed during setup. Please try again." = "设置过程中 VS Code 快捷键文件发生变化，请重试。";
 "VS Code terminal shortcuts are installed. Reload the VS Code window to apply them." = "终端快捷键已安装，请重新加载 VS Code 窗口以应用配置。";
 "Terminal setup was removed. Reload the VS Code window to apply the change." = "终端配置已移除，请重新加载 VS Code 窗口以应用变更。";
+
+/* Code editor edition policy */
+"Free keeps supported code editors and AI coding apps native. Windows-style VS Code integration requires Pro." = "Free 在已识别的代码编辑器和 AI 编程应用中保留原生快捷键。Windows 风格的 VS Code 适配需要 Pro。";
+"Setup backs up the default VS Code profile and adds removable bindings for Windsify Pro. Your ordinary VS Code shortcuts remain unchanged when Pro translation is off. Reload the VS Code window after setup or removal." = "设置会备份默认 VS Code 配置，并添加可移除的 Pro 规则。关闭 Pro 键位转换时，普通 VS Code 快捷键保持原样。配置或移除后，请重新加载 VS Code 窗口。";
+"VS Code compatibility was updated. Reload the VS Code window to apply the new edition behavior." = "VS Code 适配已更新。请重新加载 VS Code 窗口，以应用新的版本功能划分。";
+"The old Windsify VS Code block was edited. Review it manually; no configuration was changed." = "旧版 Windsify 的 VS Code 规则块已被修改。请手动检查；未更改配置。";
+"VS Code keybindings are invalid. No configuration was changed." = "VS Code 快捷键配置无效，未作任何更改。";
+"VS Code keybindings changed during cleanup. Please try again." = "清理过程中 VS Code 快捷键配置发生变化，请重试。";
+"Old VS Code shortcuts were removed. Reload the VS Code window to restore native behavior." = "旧版 VS Code 终端规则已移除。请重新加载 VS Code 窗口以恢复原生快捷键。";

@@ -362,3 +362,12 @@
 "VS Code keybindings changed during setup. Please try again." = "VS Code keybindings changed during setup. Please try again.";
 "VS Code terminal shortcuts are installed. Reload the VS Code window to apply them." = "VS Code terminal shortcuts are installed. Reload the VS Code window to apply them.";
 "Terminal setup was removed. Reload the VS Code window to apply the change." = "Terminal setup was removed. Reload the VS Code window to apply the change.";
+
+/* Code editor edition policy */
+"Free keeps supported code editors and AI coding apps native. Windows-style VS Code integration requires Pro." = "Free keeps supported code editors and AI coding apps native. Windows-style VS Code integration requires Pro.";
+"Setup backs up the default VS Code profile and adds removable bindings for Windsify Pro. Your ordinary VS Code shortcuts remain unchanged when Pro translation is off. Reload the VS Code window after setup or removal." = "Setup backs up the default VS Code profile and adds removable bindings for Windsify Pro. Your ordinary VS Code shortcuts remain unchanged when Pro translation is off. Reload the VS Code window after setup or removal.";
+"VS Code compatibility was updated. Reload the VS Code window to apply the new edition behavior." = "VS Code compatibility was updated. Reload the VS Code window to apply the new edition behavior.";
+"The old Windsify VS Code block was edited. Review it manually; no configuration was changed." = "The old Windsify VS Code block was edited. Review it manually; no configuration was changed.";
+"VS Code keybindings are invalid. No configuration was changed." = "VS Code keybindings are invalid. No configuration was changed.";
+"VS Code keybindings changed during cleanup. Please try again." = "VS Code keybindings changed during cleanup. Please try again.";
+"Old VS Code shortcuts were removed. Reload the VS Code window to restore native behavior." = "Old VS Code shortcuts were removed. Reload the VS Code window to restore native behavior.";

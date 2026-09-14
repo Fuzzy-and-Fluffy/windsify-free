@@ -49,8 +49,8 @@ targets:
         PRODUCT_MODULE_NAME: WindsifyMac
         CODE_SIGN_STYLE: Automatic
         ENABLE_HARDENED_RUNTIME: YES
-        MARKETING_VERSION: 1.4.2
-        CURRENT_PROJECT_VERSION: 55
+        MARKETING_VERSION: 1.4.3
+        CURRENT_PROJECT_VERSION: 58
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
 
@@ -60,7 +60,7 @@ targets:
     sources:
       - Tests/AppLanguageTests.swift
       - Tests/FreeKeyboardEngineTests.swift
-      - Tests/VSCodeInputContextTests.swift
+      - Tests/CodeEditorPolicyTests.swift
       - Tests/KeyboardRuntimeHelpersTests.swift
       - Tests/ConflictDiagnosticsTests.swift
       - Tests/ShortcutSupportTests.swift
