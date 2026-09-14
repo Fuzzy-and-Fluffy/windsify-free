@@ -33,12 +33,7 @@ xcodebuild \
   -destination 'platform=macOS' \
   -derivedDataPath "$DERIVED_DATA" \
   CODE_SIGNING_ALLOWED=NO \
-  build
+  build-for-testing
 
-xcodebuild \
-  -project "$PROJECT_GENERATION_DIR/WindsifyFree.xcodeproj" \
-  -scheme WindsifyFree \
-  -destination 'platform=macOS' \
-  -derivedDataPath "$DERIVED_DATA" \
-  CODE_SIGNING_ALLOWED=NO \
-  test
+python3 "$PROJECT_DIR/scripts/run-local-tests.py" \
+  "$DERIVED_DATA/Build/Products" app.windsify.mac.free.debug
