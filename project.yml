@@ -53,6 +53,9 @@ targets:
         CURRENT_PROJECT_VERSION: 58
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+      configs:
+        Debug:
+          PRODUCT_BUNDLE_IDENTIFIER: app.windsify.mac.free.debug
 
   WindsifyFreeTests:
     type: bundle.unit-test
