@@ -333,8 +333,8 @@
 "keyboard remapping" = "键位映射";
 "macOS Modifier Keys" = "macOS 修饰键";
 "macOS could not create the keyboard event tap." = "macOS 无法创建键盘事件监听器。";
-"macOS has %@ saved keyboard modifier mapping(s). These can overlap with Windsify Mac's shortcut translation." = "macOS 保存了 %@ 项键盘修饰键映射，可能与 Windsify Mac 的快捷键转换发生冲突。";
-"macOS has %d saved keyboard modifier mapping(s). These can overlap with Windsify Mac's shortcut translation." = "macOS 保存了 %d 项键盘修饰键映射，可能与 Windsify Mac 的快捷键转换发生冲突。";
+"macOS has %@ keyboard modifier mapping(s) for keyboards detected at the last scan. These can overlap with Windsify Mac's shortcut translation." = "上次检查时检测到的键盘有 %@ 项 macOS 修饰键映射，可能与 Windsify Mac 的快捷键转换发生冲突。";
+"macOS has %@ saved modifier mapping setting(s) whose effect on keyboards at the last scan could not be confirmed." = "macOS 保存了 %@ 项修饰键映射设置，但无法确认它们在上次检查时是否影响键盘。";
 "macOS is protecting keyboard input, for example while a password field is active. Leave that field and try again." = "macOS 正在保护键盘输入，例如当前选中了密码输入框。请离开该输入框后重试。";
 "window management" = "窗口管理";
 "Finder Ctrl+X, then Ctrl+V" = "Finder Ctrl+X，然后 Ctrl+V";
