@@ -1,5 +1,6 @@
 import AppKit
 import Foundation
+import IOKit.hid
 
 enum ConflictSeverity: Equatable {
     case warning
@@ -58,7 +59,8 @@ struct ConflictSnapshot: Equatable {
     var runningApplicationBundleIdentifiers: Set<String> = []
     var runningProcessNames: Set<String> = []
     var hidutilUserKeyMappingCount = 0
-    var macOSModifierMappingPreferenceKeys: Set<String> = []
+    var activeMacOSModifierMappingKeys: Set<String> = []
+    var uncertainMacOSModifierMappingKeys: Set<String> = []
 }
 
 protocol ConflictRule {
@@ -276,27 +278,131 @@ struct HIDUtilConflictRule: ConflictRule {
 
 struct MacOSModifierMappingConflictRule: ConflictRule {
     func findings(in snapshot: ConflictSnapshot) -> [ConflictFinding] {
-        let count = snapshot.macOSModifierMappingPreferenceKeys.count
-        guard count > 0 else {
-            return []
-        }
-
-        return [
-            ConflictFinding(
+        var findings: [ConflictFinding] = []
+        let activeCount = snapshot.activeMacOSModifierMappingKeys.count
+        if activeCount > 0 {
+            findings.append(ConflictFinding(
                 id: "system.macos-modifier-mapping",
                 title: "macOS Modifier Keys",
-                message: "macOS has \(count) saved keyboard modifier "
-                    + "mapping(s). These can overlap with Windsify Mac's "
-                    + "shortcut translation.",
+                message: "macOS has \(activeCount) keyboard modifier "
+                    + "mapping(s) for keyboards detected at the last scan. These can overlap "
+                    + "with Windsify Mac's shortcut translation.",
                 recommendation: "Review System Settings → Keyboard → Keyboard "
                     + "Shortcuts → Modifier Keys. Windsify Mac will not alter "
                     + "these settings.",
                 severity: .blocking,
                 affectedCapabilities: [.keyboardTranslation],
-                messageFormat: "macOS has %@ saved keyboard modifier mapping(s). These can overlap with Windsify Mac's shortcut translation.",
-                messageArguments: [String(count)]
-            ),
-        ]
+                messageFormat: "macOS has %@ keyboard modifier mapping(s) for keyboards detected at the last scan. These can overlap with Windsify Mac's shortcut translation.",
+                messageArguments: [String(activeCount)]
+            ))
+        }
+
+        let uncertainCount = snapshot.uncertainMacOSModifierMappingKeys.count
+        if uncertainCount > 0 {
+            findings.append(ConflictFinding(
+                id: "system.macos-modifier-mapping-uncertain",
+                title: "macOS Modifier Keys",
+                message: "macOS has \(uncertainCount) saved modifier mapping "
+                    + "setting(s) whose effect on keyboards at the last scan could "
+                    + "not be confirmed.",
+                recommendation: "Review System Settings → Keyboard → Keyboard "
+                    + "Shortcuts → Modifier Keys. Windsify Mac will not alter "
+                    + "these settings.",
+                severity: .warning,
+                affectedCapabilities: [.keyboardTranslation],
+                messageFormat: "macOS has %@ saved modifier mapping setting(s) whose effect on keyboards at the last scan could not be confirmed.",
+                messageArguments: [String(uncertainCount)]
+            ))
+        }
+        return findings
+    }
+}
+
+struct ModifierKeyboardIdentity: Hashable {
+    let vendor: Int
+    let product: Int
+    let location: Int
+
+    init?(key: String) {
+        let parts = key.split(separator: "-", omittingEmptySubsequences: false)
+        guard parts.count == 3,
+              let vendor = Int(parts[0]),
+              let product = Int(parts[1]),
+              let location = Int(parts[2]),
+              vendor >= 0, product >= 0, location >= 0 else { return nil }
+        self.vendor = vendor
+        self.product = product
+        self.location = location
+    }
+
+    init(vendor: Int, product: Int, location: Int) {
+        self.vendor = vendor
+        self.product = product
+        self.location = location
+    }
+
+    func matches(_ connected: ModifierKeyboardIdentity) -> Bool {
+        (vendor == 0 && product == 0 ||
+            vendor == connected.vendor && product == connected.product)
+            && (location == 0 || location == connected.location)
+    }
+}
+
+struct ModifierMappingEvidence {
+    var activeKeys: Set<String> = []
+    var uncertainKeys: Set<String> = []
+
+    static func evaluate(
+        preferences: [String: Any],
+        connectedKeyboards: Set<ModifierKeyboardIdentity>?
+    ) -> ModifierMappingEvidence {
+        let prefix = "com.apple.keyboard.modifiermapping."
+        var evidence = ModifierMappingEvidence()
+        for (key, value) in preferences where key.lowercased().hasPrefix(prefix) {
+            guard let mappings = value as? [Any] else {
+                evidence.uncertainKeys.insert(key)
+                continue
+            }
+            var hasChangedMapping = false
+            var hasUnclearMapping = false
+            for entry in mappings {
+                guard let pair = entry as? [String: Any],
+                      let source = usage(pair["HIDKeyboardModifierMappingSrc"]),
+                      let destination = usage(pair["HIDKeyboardModifierMappingDst"]) else {
+                    hasUnclearMapping = true
+                    continue
+                }
+                hasChangedMapping = hasChangedMapping || source != destination
+            }
+            if hasUnclearMapping { evidence.uncertainKeys.insert(key) }
+            guard hasChangedMapping else { continue }
+            let suffix = String(key.dropFirst(prefix.count))
+            guard let keyboard = ModifierKeyboardIdentity(key: suffix),
+                  let connectedKeyboards else {
+                evidence.uncertainKeys.insert(key)
+                continue
+            }
+            if connectedKeyboards.contains(where: keyboard.matches) {
+                evidence.activeKeys.insert(key)
+            } else {
+                evidence.uncertainKeys.insert(key)
+            }
+        }
+        return evidence
+    }
+
+    private static func usage(_ value: Any?) -> UInt64? {
+        if let number = value as? NSNumber {
+            guard CFGetTypeID(number) != CFBooleanGetTypeID() else { return nil }
+            return UInt64(number.stringValue)
+        }
+        if let string = value as? String {
+            if string.lowercased().hasPrefix("0x") {
+                return UInt64(string.dropFirst(2), radix: 16)
+            }
+            return UInt64(string)
+        }
+        return nil
     }
 }
 
@@ -333,17 +439,27 @@ struct SystemConflictSnapshotProvider: ConflictSnapshotProviding {
 
     private let fileManager: FileManager
     private let homeDirectory: URL
+    private let hostIdentifierOverride: String?
+    private let connectedKeyboardsOverride: Set<ModifierKeyboardIdentity>?
+    private let globalDomainOverride: [String: Any]?
 
     init(
         fileManager: FileManager = .default,
-        homeDirectory: URL = FileManager.default.homeDirectoryForCurrentUser
+        homeDirectory: URL = FileManager.default.homeDirectoryForCurrentUser,
+        hostIdentifierOverride: String? = nil,
+        connectedKeyboardsOverride: Set<ModifierKeyboardIdentity>? = nil,
+        globalDomainOverride: [String: Any]? = nil
     ) {
         self.fileManager = fileManager
         self.homeDirectory = homeDirectory
+        self.hostIdentifierOverride = hostIdentifierOverride
+        self.connectedKeyboardsOverride = connectedKeyboardsOverride
+        self.globalDomainOverride = globalDomainOverride
     }
 
     func snapshot() -> ConflictSnapshot {
-        ConflictSnapshot(
+        let modifierEvidence = macOSModifierMappingEvidence()
+        return ConflictSnapshot(
             installedApplicationBundleIdentifiers:
                 installedApplicationBundleIdentifiers(),
             runningApplicationBundleIdentifiers: Set(
@@ -353,8 +469,8 @@ struct SystemConflictSnapshotProvider: ConflictSnapshotProviding {
             ),
             runningProcessNames: runningProcessNames(),
             hidutilUserKeyMappingCount: hidutilUserKeyMappingCount(),
-            macOSModifierMappingPreferenceKeys:
-                macOSModifierMappingPreferenceKeys()
+            activeMacOSModifierMappingKeys: modifierEvidence.activeKeys,
+            uncertainMacOSModifierMappingKeys: modifierEvidence.uncertainKeys
         )
     }
 
@@ -424,38 +540,37 @@ struct SystemConflictSnapshotProvider: ConflictSnapshotProviding {
         return max(count, output.contains("{") ? 1 : 0)
     }
 
-    private func macOSModifierMappingPreferenceKeys() -> Set<String> {
-        var keys: Set<String> = []
-
-        if let globalDomain = UserDefaults.standard.persistentDomain(
-            forName: UserDefaults.globalDomain
-        ) {
-            keys.formUnion(modifierMappingKeys(in: globalDomain))
-        }
-
+    func macOSModifierMappingEvidence() -> ModifierMappingEvidence {
         let globalPreferences = homeDirectory
             .appendingPathComponent("Library/Preferences/.GlobalPreferences.plist")
-        keys.formUnion(modifierMappingKeys(inPlistAt: globalPreferences))
-
-        let byHostDirectory = homeDirectory
-            .appendingPathComponent("Library/Preferences/ByHost")
-        if let urls = try? fileManager.contentsOfDirectory(
-            at: byHostDirectory,
-            includingPropertiesForKeys: nil,
-            options: []
+        var preferences = modifierMappingPreferences(inPlistAt: globalPreferences)
+        if let globalDomain = globalDomainOverride ?? UserDefaults.standard.persistentDomain(
+            forName: UserDefaults.globalDomain
         ) {
-            for url in urls where
-                url.lastPathComponent.hasPrefix(".GlobalPreferences.")
-                    && url.pathExtension == "plist"
-            {
-                keys.formUnion(modifierMappingKeys(inPlistAt: url))
-            }
+            preferences.merge(globalDomain) { _, live in live }
         }
-
-        return keys
+        if let hostIdentifier = hostIdentifierOverride ?? currentHostIdentifier() {
+            let byHostPreferences = homeDirectory.appendingPathComponent(
+                "Library/Preferences/ByHost/.GlobalPreferences.\(hostIdentifier).plist"
+            )
+            preferences.merge(
+                modifierMappingPreferences(inPlistAt: byHostPreferences)
+            ) { _, currentHost in currentHost }
+        }
+        if hostIdentifierOverride == nil,
+           let liveCurrentHost = CFPreferencesCopyMultiple(
+            nil, kCFPreferencesAnyApplication,
+            kCFPreferencesCurrentUser, kCFPreferencesCurrentHost
+           ) as? [String: Any] {
+            preferences.merge(liveCurrentHost) { _, live in live }
+        }
+        return ModifierMappingEvidence.evaluate(
+            preferences: preferences,
+            connectedKeyboards: connectedKeyboardsOverride ?? connectedKeyboards()
+        )
     }
 
-    private func modifierMappingKeys(inPlistAt url: URL) -> Set<String> {
+    private func modifierMappingPreferences(inPlistAt url: URL) -> [String: Any] {
         guard
             let data = try? Data(contentsOf: url),
             let dictionary = try? PropertyListSerialization.propertyList(
@@ -464,22 +579,47 @@ struct SystemConflictSnapshotProvider: ConflictSnapshotProviding {
                 format: nil
             ) as? [String: Any]
         else {
-            return []
+            return [:]
         }
-
-        return modifierMappingKeys(in: dictionary)
+        return dictionary
     }
 
-    private func modifierMappingKeys(
-        in dictionary: [String: Any]
-    ) -> Set<String> {
-        Set(
-            dictionary.keys.filter {
-                $0.lowercased().hasPrefix(
-                    "com.apple.keyboard.modifiermapping."
-                )
-            }
+    private func currentHostIdentifier() -> String? {
+        let service = IOServiceGetMatchingService(
+            kIOMainPortDefault, IOServiceMatching("IOPlatformExpertDevice")
         )
+        guard service != 0 else { return nil }
+        defer { IOObjectRelease(service) }
+        return IORegistryEntryCreateCFProperty(
+            service, "IOPlatformUUID" as CFString, kCFAllocatorDefault, 0
+        )?.takeRetainedValue() as? String
+    }
+
+    private func connectedKeyboards() -> Set<ModifierKeyboardIdentity>? {
+        let manager = IOHIDManagerCreate(
+            kCFAllocatorDefault, IOOptionBits(kIOHIDOptionsTypeNone)
+        )
+        IOHIDManagerSetDeviceMatching(manager, [
+            kIOHIDDeviceUsagePageKey: kHIDPage_GenericDesktop,
+            kIOHIDDeviceUsageKey: kHIDUsage_GD_Keyboard,
+        ] as CFDictionary)
+        guard let devices = IOHIDManagerCopyDevices(manager)
+            as? Set<IOHIDDevice>, !devices.isEmpty else { return nil }
+        let identities = Set(devices.compactMap { device -> ModifierKeyboardIdentity? in
+            guard let vendor = IOHIDDeviceGetProperty(
+                device, kIOHIDVendorIDKey as CFString
+            ) as? Int,
+            let product = IOHIDDeviceGetProperty(
+                device, kIOHIDProductIDKey as CFString
+            ) as? Int else { return nil }
+            let location = IOHIDDeviceGetProperty(
+                device, kIOHIDLocationIDKey as CFString
+            ) as? Int ?? 0
+            return ModifierKeyboardIdentity(
+                vendor: vendor, product: product, location: location
+            )
+        })
+        return identities.isEmpty ? nil : identities
     }
 
     private func runReadOnlyProcess(

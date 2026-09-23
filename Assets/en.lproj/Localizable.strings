@@ -333,8 +333,8 @@
 "keyboard remapping" = "keyboard remapping";
 "macOS Modifier Keys" = "macOS Modifier Keys";
 "macOS could not create the keyboard event tap." = "macOS could not create the keyboard event tap.";
-"macOS has %@ saved keyboard modifier mapping(s). These can overlap with Windsify Mac's shortcut translation." = "macOS has %@ saved keyboard modifier mapping(s). These can overlap with Windsify Mac's shortcut translation.";
-"macOS has %d saved keyboard modifier mapping(s). These can overlap with Windsify Mac's shortcut translation." = "macOS has %d saved keyboard modifier mapping(s). These can overlap with Windsify Mac's shortcut translation.";
+"macOS has %@ keyboard modifier mapping(s) for keyboards detected at the last scan. These can overlap with Windsify Mac's shortcut translation." = "macOS has %@ keyboard modifier mapping(s) for keyboards detected at the last scan. These can overlap with Windsify Mac's shortcut translation.";
+"macOS has %@ saved modifier mapping setting(s) whose effect on keyboards at the last scan could not be confirmed." = "macOS has %@ saved modifier mapping setting(s) whose effect on keyboards at the last scan could not be confirmed.";
 "macOS is protecting keyboard input, for example while a password field is active. Leave that field and try again." = "macOS is protecting keyboard input, for example while a password field is active. Leave that field and try again.";
 "window management" = "window management";
 "Finder Ctrl+X, then Ctrl+V" = "Finder Ctrl+X, then Ctrl+V";
