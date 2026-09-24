@@ -68,6 +68,12 @@ struct SyntheticKeyboardEventFactory {
                 ambient: originalEvent.flags,
                 modifiers: stroke.modifiers
             )
+            if stroke.keyCode == MacKeyCode.delete,
+               !stroke.modifiers.contains(.function) {
+                // A source reopened from Fn+Delete can carry SecondaryFn into
+                // the new Backspace event. Finder needs plain Command+Backspace.
+                event.flags.remove(.maskSecondaryFn)
+            }
             event.setIntegerValueField(
                 .eventSourceUserData,
                 value: CGEventTapController.syntheticEventMarker
@@ -689,9 +695,13 @@ final class CGEventTapController {
             // the user deliberately added Fn to this shortcut.
             modifiers.remove(.function)
         }
+        // A forward-delete key can also carry SecondaryFn (including when
+        // macOS resolves Fn+Backspace to key code 117). Its key code already
+        // identifies the Delete action, so Fn is not a shortcut modifier.
         if [
             MacKeyCode.home,
             MacKeyCode.end,
+            MacKeyCode.forwardDelete,
             MacKeyCode.leftArrow,
             MacKeyCode.rightArrow,
             MacKeyCode.downArrow,
