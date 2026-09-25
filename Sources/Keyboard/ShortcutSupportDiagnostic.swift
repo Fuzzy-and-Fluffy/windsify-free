@@ -3,7 +3,7 @@ import Foundation
 enum ShortcutTestKind: String, CaseIterable, Identifiable {
     case closeWindow = "Close a window (Alt+F4)"
     case anotherShortcut = "Another shortcut"
-    case liveClaude = "Claude copy/paste (live check)"
+    case liveChat = "ChatGPT / Claude copy/paste (live check)"
     var id: String { rawValue }
 }
 
@@ -127,6 +127,7 @@ struct ShortcutSupportResult: Equatable {
         case .cycleInputSource: return "Switch input source"
         case .finderClipboard: return "Finder clipboard action"
         case .captureWindow: return "Window screenshot"
+        case .captureSelection: return "Frozen selection screenshot"
         }
     }
 }

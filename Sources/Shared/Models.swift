@@ -102,6 +102,7 @@ enum EngineAction: Equatable, Sendable {
     case finderClipboard(FinderClipboardAction)
     case closeFrontWindow
     case captureWindow
+    case captureSelection
 }
 
 enum FinderClipboardAction: Equatable, Sendable {

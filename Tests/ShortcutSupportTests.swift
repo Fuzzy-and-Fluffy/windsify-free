@@ -72,7 +72,7 @@ final class ShortcutSupportTests: XCTestCase {
 
     func testLiveClaudeCheckObservesOneActualDecisionWithoutChangingEvent() {
         let model = makeModel()
-        model.kind = .liveClaude
+        model.kind = .liveChat
         model.isApplicationActive = { false }
         model.start()
         let key = event(code: MacKeyCode.c, flags: [.maskControl])
@@ -98,9 +98,28 @@ final class ShortcutSupportTests: XCTestCase {
         XCTAssertNil(model.intercept(type: .keyUp, event: event(code: MacKeyCode.c, down: false, flags: [.maskControl])))
     }
 
+    func testLiveChatGPTCheckCapturesOneDecisionWithoutConsumingTheShortcut() {
+        let model = makeModel()
+        model.kind = .liveChat
+        model.isApplicationActive = { false }
+        model.start()
+        let key = event(code: MacKeyCode.v, flags: [.maskControl])
+        let stroke = KeyboardStroke(keyCode: MacKeyCode.v, modifiers: [.control])
+        let context = CodeEditorPolicy.context(bundleIdentifier: "com.openai.codex", focus: .textInput)
+        let decision = RuleDecision(ruleID: "generic.control-to-command", action: .replace([
+            .init(keyCode: MacKeyCode.v, modifiers: [.command])
+        ]))
+        XCTAssertNil(model.intercept(type: .keyDown, event: key))
+        model.observeLive(event: key, stroke: stroke, context: context, decision: decision, contextMilliseconds: 3)
+        XCTAssertEqual(model.result?.ruleID, "generic.control-to-command")
+        XCTAssertTrue(model.report.contains("Live application: com.openai.codex"))
+        XCTAssertFalse(model.isListening)
+        XCTAssertEqual(key.flags, [.maskControl])
+    }
+
     func testLiveCheckIgnoresUnarmedOtherAppTypingRepeatsAndSyntheticEvents() {
         let model = makeModel()
-        model.kind = .liveClaude
+        model.kind = .liveChat
         let key = event(code: MacKeyCode.v, flags: [.maskControl])
         let stroke = KeyboardStroke(keyCode: MacKeyCode.v, modifiers: [.control])
         let context = CodeEditorPolicy.context(bundleIdentifier: "com.anthropic.claudefordesktop", focus: .textInput)

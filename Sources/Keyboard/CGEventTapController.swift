@@ -504,7 +504,7 @@ final class CGEventTapController {
             return nil
 
         case .openApplication, .finderClipboard, .closeFrontWindow,
-             .captureWindow:
+             .captureWindow, .captureSelection:
             return dispatchExtendedAction(
                 decision.action,
                 event: event,
