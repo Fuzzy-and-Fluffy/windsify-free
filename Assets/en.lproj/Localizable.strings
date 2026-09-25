@@ -202,6 +202,20 @@
 "Safe preview: Windsify won't run the shortcut. macOS may still handle reserved system keys. Only this test's key details are collected, not typed text." = "Safe preview: Windsify won't run the shortcut. macOS may still handle reserved system keys. Only this test's key details are collected, not typed text.";
 "Scan Again" = "Scan Again";
 "Screenshot shortcuts" = "Screenshot shortcuts";
+"Screenshot" = "Screenshot";
+"Capture Selection to Clipboard" = "Capture Selection to Clipboard";
+"Allow Screen Recording" = "Allow Screen Recording";
+"Allow Windsify Mac to record the screen in System Settings, then use Capture Selection to Clipboard again. Windsify keeps the captured image in memory and only copies your selection." = "Allow Windsify Mac to record the screen in System Settings, then use Capture Selection to Clipboard again. Windsify keeps the captured image in memory and only copies your selection.";
+"Capture unavailable" = "Capture unavailable";
+"Windsify could not find a display to capture." = "Windsify could not find a display to capture.";
+"Capture failed" = "Capture failed";
+"Windsify could not capture the displays. Check Screen Recording permission and try again." = "Windsify could not capture the displays. Check Screen Recording permission and try again.";
+"Copy failed" = "Copy failed";
+"Windsify could not prepare the selected image for the clipboard." = "Windsify could not prepare the selected image for the clipboard.";
+"Windsify could not copy the selected image to the clipboard." = "Windsify could not copy the selected image to the clipboard.";
+"Windsify could not crop the selected image." = "Windsify could not crop the selected image.";
+"Windsify could not encode the selected image." = "Windsify could not encode the selected image.";
+"Ctrl+Shift+4 freezes the displays, then uses the macOS screenshot cursor. Drag to copy a region; press Esc to cancel." = "Ctrl+Shift+4 freezes the displays, then uses the macOS screenshot cursor. Drag to copy a region; press Esc to cancel.";
 "Search" = "Search";
 "Search / Switch input source" = "Search / Switch input source";
 "Select next enabled input source" = "Select next enabled input source";
@@ -383,19 +397,19 @@
 "Interrupt; use Ctrl+Shift+C to copy" = "Interrupt; use Ctrl+Shift+C to copy";
 "Free uses generic Windows shortcuts throughout editors without detecting terminal panes. Pro distinguishes main views from supported terminals. In Free embedded terminals, Ctrl+C becomes copy; standalone terminal apps keep native Control shortcuts." = "Free uses generic Windows shortcuts throughout editors without detecting terminal panes. Pro distinguishes main views from supported terminals. In Free embedded terminals, Ctrl+C becomes copy; standalone terminal apps keep native Control shortcuts.";
 
-"Claude copy/paste (live check)" = "Claude copy/paste (live check)";
+"ChatGPT / Claude copy/paste (live check)" = "ChatGPT / Claude copy/paste (live check)";
 
-"Claude shortcut captured" = "Claude shortcut captured";
+"Chat shortcut captured" = "Chat shortcut captured";
 
-"No Claude shortcut captured" = "No Claude shortcut captured";
+"No Chat shortcut captured" = "No Chat shortcut captured";
 
 "This is the real keyboard service decision. Normal shortcut processing was left unchanged; no text or clipboard content was collected." = "This is the real keyboard service decision. Normal shortcut processing was left unchanged; no text or clipboard content was collected.";
 
 "No matching Ctrl+C or Ctrl+V decision reached this check within 60 seconds. This does not prove the keyboard sent nothing." = "No matching Ctrl+C or Ctrl+V decision reached this check within 60 seconds. This does not prove the keyboard sent nothing.";
 
-"Switch to Claude and press Ctrl+C or Ctrl+V once. Return here for the result. The check stops after one shortcut or 60 seconds." = "Switch to Claude and press Ctrl+C or Ctrl+V once. Return here for the result. The check stops after one shortcut or 60 seconds.";
+"Switch to ChatGPT or Claude and press Ctrl+C or Ctrl+V once. Return here for the result. The check stops after one shortcut or 60 seconds." = "Switch to ChatGPT or Claude and press Ctrl+C or Ctrl+V once. Return here for the result. The check stops after one shortcut or 60 seconds.";
 
-"Live check: your shortcut runs normally. Only one Claude Ctrl+C or Ctrl+V decision is kept in memory. No text, selection or clipboard content is collected." = "Live check: your shortcut runs normally. Only one Claude Ctrl+C or Ctrl+V decision is kept in memory. No text, selection or clipboard content is collected.";
+"Live check: your shortcut runs normally. Only one ChatGPT or Claude Ctrl+C or Ctrl+V decision is kept in memory. No text, selection or clipboard content is collected." = "Live check: your shortcut runs normally. Only one ChatGPT or Claude Ctrl+C or Ctrl+V decision is kept in memory. No text, selection or clipboard content is collected.";
 
 // Automatic VS Code integration
 "Automatically configure VS Code terminal" = "Automatically configure VS Code terminal";

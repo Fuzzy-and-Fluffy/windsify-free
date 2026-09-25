@@ -202,6 +202,20 @@
 "Safe preview: Windsify won't run the shortcut. macOS may still handle reserved system keys. Only this test's key details are collected, not typed text." = "安全预览：Windsify 不会执行此快捷键，但 macOS 仍可能响应保留的系统按键。仅收集本次测试的按键信息，不会收集你输入的文字。";
 "Scan Again" = "重新检查";
 "Screenshot shortcuts" = "截屏快捷键";
+"Screenshot" = "截屏";
+"Capture Selection to Clipboard" = "截取区域并复制到剪贴板";
+"Allow Screen Recording" = "允许屏幕录制";
+"Allow Windsify Mac to record the screen in System Settings, then use Capture Selection to Clipboard again. Windsify keeps the captured image in memory and only copies your selection." = "请在系统设置中允许 Windsify Mac 录制屏幕，然后再次使用“截取区域并复制到剪贴板”。Windsify 仅将所选图像保存在内存中并复制到剪贴板。";
+"Capture unavailable" = "无法截屏";
+"Windsify could not find a display to capture." = "Windsify 未找到可截取的显示器。";
+"Capture failed" = "截屏失败";
+"Windsify could not capture the displays. Check Screen Recording permission and try again." = "Windsify 无法截取显示器画面。请检查屏幕录制权限后重试。";
+"Copy failed" = "复制失败";
+"Windsify could not prepare the selected image for the clipboard." = "Windsify 无法将所选图像准备好复制到剪贴板。";
+"Windsify could not copy the selected image to the clipboard." = "Windsify 无法将所选图像复制到剪贴板。";
+"Windsify could not crop the selected image." = "Windsify 无法裁剪所选图像。";
+"Windsify could not encode the selected image." = "Windsify 无法编码所选图像。";
+"Ctrl+Shift+4 freezes the displays, then uses the macOS screenshot cursor. Drag to copy a region; press Esc to cancel." = "Ctrl+Shift+4 先冻结画面，再使用 macOS 原生截图光标。拖选区域即可复制图片，按 Esc 取消。";
 "Search" = "搜索";
 "Search / Switch input source" = "搜索 / 切换输入法";
 "Select next enabled input source" = "切换到下一个已启用的输入法";
@@ -383,19 +397,19 @@
 "Interrupt; use Ctrl+Shift+C to copy" = "中断；复制请用 Ctrl+Shift+C";
 "Free uses generic Windows shortcuts throughout editors without detecting terminal panes. Pro distinguishes main views from supported terminals. In Free embedded terminals, Ctrl+C becomes copy; standalone terminal apps keep native Control shortcuts." = "Free 在整个编辑器中使用通用 Windows 快捷键，不识别终端区域。Pro 区分主界面与已支持的终端。Free 内置终端中的 Ctrl+C 用于复制；独立终端保留原生 Control 快捷键。";
 
-"Claude copy/paste (live check)" = "Claude 复制粘贴（实际按键检查）";
+"ChatGPT / Claude copy/paste (live check)" = "ChatGPT / Claude 复制粘贴（实际按键检查）";
 
-"Claude shortcut captured" = "已捕获 Claude 的实际快捷键";
+"Chat shortcut captured" = "已捕获聊天应用的实际快捷键";
 
-"No Claude shortcut captured" = "未捕获到 Claude 快捷键";
+"No Chat shortcut captured" = "未捕获到聊天应用快捷键";
 
 "This is the real keyboard service decision. Normal shortcut processing was left unchanged; no text or clipboard content was collected." = "这是实际键盘引擎做出的决定。诊断没有干预快捷键的正常处理流程；没有收集正文或剪贴板内容。";
 
 "No matching Ctrl+C or Ctrl+V decision reached this check within 60 seconds. This does not prove the keyboard sent nothing." = "60 秒内没有收到匹配的 Ctrl+C 或 Ctrl+V 处理结果。这不代表键盘没有发送按键。";
 
-"Switch to Claude and press Ctrl+C or Ctrl+V once. Return here for the result. The check stops after one shortcut or 60 seconds." = "切换到 Claude，按一次 Ctrl+C 或 Ctrl+V，然后返回这里查看结果。检查在捕获一次快捷键后或 60 秒后停止。";
+"Switch to ChatGPT or Claude and press Ctrl+C or Ctrl+V once. Return here for the result. The check stops after one shortcut or 60 seconds." = "切换到 ChatGPT 或 Claude，按一次 Ctrl+C 或 Ctrl+V，然后返回这里查看结果。检查在捕获一次快捷键后或 60 秒后停止。";
 
-"Live check: your shortcut runs normally. Only one Claude Ctrl+C or Ctrl+V decision is kept in memory. No text, selection or clipboard content is collected." = "实际按键检查：快捷键照常执行。内存中只保留一次 Claude Ctrl+C 或 Ctrl+V 的处理结果，不收集正文、选区或剪贴板内容。";
+"Live check: your shortcut runs normally. Only one ChatGPT or Claude Ctrl+C or Ctrl+V decision is kept in memory. No text, selection or clipboard content is collected." = "实际按键检查：快捷键照常执行。内存中只保留一次 ChatGPT 或 Claude Ctrl+C 或 Ctrl+V 的处理结果，不收集正文、选区或剪贴板内容。";
 
 // Automatic VS Code integration
 "Automatically configure VS Code terminal" = "自动配置 VS Code 终端";
