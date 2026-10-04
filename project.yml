@@ -68,6 +68,8 @@ targets:
       - Tests/InputRuntimeSafetyTests.swift
       - Tests/ConflictDiagnosticsTests.swift
       - Tests/ShortcutSupportTests.swift
+      - Tests/SpotlightActivationTests.swift
+      - Tests/SearchProviderTests.swift
     dependencies:
       - target: WindsifyFree
     settings:

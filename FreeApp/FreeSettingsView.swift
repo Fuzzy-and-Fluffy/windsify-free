@@ -8,6 +8,7 @@ struct FreeSettingsView: View {
         Form {
             LanguageSettingsSection()
             Section("Windows keyboard essentials") {
+                SearchProviderPicker()
                 if let message = appState.codeEditorMigrationMessage { Text(L10n.text(message)) }
                 Text(L10n.text("Free uses generic Windows shortcuts throughout editors, including embedded terminals. Ctrl+C becomes copy there, not interrupt. Pro adds pane-aware terminal support. Standalone terminal apps keep native Control shortcuts."))
                     .font(.caption)

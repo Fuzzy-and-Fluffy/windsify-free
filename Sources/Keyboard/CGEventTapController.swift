@@ -869,6 +869,10 @@ final class CGEventTapController {
 
     private static func openApplication(_ bundleIdentifier: String) {
         guard !InputRuntimeSafety.isTestHost else { return }
+        if bundleIdentifier == "com.apple.Spotlight" {
+            SystemSearchActivation.activate()
+            return
+        }
         guard let applicationURL = NSWorkspace.shared
             .urlForApplication(withBundleIdentifier: bundleIdentifier) else {
             return
