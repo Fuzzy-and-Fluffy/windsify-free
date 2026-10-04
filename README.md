@@ -88,6 +88,22 @@ xcodebuild -project WindsifyFree.xcodeproj \
   CODE_SIGNING_ALLOWED=NO test
 ```
 
+For a source build of the immutable `v1.4.20` tag, generate the project as
+above, then explicitly set its release version and build number:
+
+```sh
+xcodebuild -project WindsifyFree.xcodeproj \
+  -scheme WindsifyFree \
+  -destination 'platform=macOS' \
+  CODE_SIGNING_ALLOWED=NO \
+  MARKETING_VERSION=1.4.20 CURRENT_PROJECT_VERSION=115 build
+```
+
+The project specification contains historical source-build defaults; those
+defaults do not identify the official release. The official packaging workflow
+sets these values explicitly. This command makes the source-built app display
+`1.4.20 (115)` without changing the published tag or the signed download.
+
 The first run requires macOS Accessibility permission. Menu-key support may
 also require Input Monitoring permission. Review the source and build it
 yourself, or visit [windsify.com](https://windsify.com) for official build
