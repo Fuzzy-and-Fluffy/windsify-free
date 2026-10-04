@@ -21,10 +21,14 @@ Included behavior:
 - Ctrl+Arrow and Ctrl+Delete word navigation and deletion;
 - Alt+Tab, Alt+Shift+Tab, Alt+F4 and Ctrl+F4;
 - Ctrl+Insert and Shift+Insert;
+- a bare Windows key opens the selected search app (Spotlight by default, or installed Raycast);
 - Win+Space input-source switching;
 - the Windows Application/Menu key opens the focused contextual menu;
 - native Ctrl+Space, Ctrl+Tab, Shift+Arrow selection, secure input, remote
   desktop input, and Terminal Ctrl sequences including Ctrl+C.
+
+Choose the search app in Settings under **Windows keyboard essentials > Windows key search**. This
+choice preserves existing system and Raycast shortcuts.
 
 Windsify Free does not include Finder automation, screenshot and system
 shortcuts, Windows Terminal app actions, window management, drag-to-edge

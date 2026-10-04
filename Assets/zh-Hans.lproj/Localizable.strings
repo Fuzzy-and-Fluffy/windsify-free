@@ -427,3 +427,12 @@
 "VS Code sends shortcuts directly to the shell. Turn off terminal.integrated.sendKeybindingsToShell to enable terminal support." = "VS Code 当前将快捷键直接发送给 Shell。请关闭 terminal.integrated.sendKeybindingsToShell 后使用终端支持。";
 
 "Automatic VS Code setup requires a profile on this Mac's internal disk. External or network profiles are left unchanged to avoid background file-access prompts." = "自动配置需要 VS Code 配置位于本机内置磁盘。外置盘或网络盘配置保持不变，以免后台触发文件访问弹窗。";
+
+"Spotlight could not open" = "无法打开聚焦搜索";
+"Windsify cannot open Spotlight because Show Spotlight search is disabled or its shortcut is unavailable. In System Settings > Keyboard > Keyboard Shortcuts > Spotlight, enable Show Spotlight search and choose a shortcut that does not conflict with input-source switching, then try again." = "“显示聚焦搜索”未启用或其快捷键不可用，Windsify 无法打开聚焦搜索。请前往系统设置 > 键盘 > 键盘快捷键 > 聚焦，启用“显示聚焦搜索”，并设置一个不与输入法切换冲突的快捷键，然后重试。";
+"Windsify could not send the configured Spotlight shortcut. Restart Windsify and try again. You can still open Spotlight from the menu bar." = "Windsify 无法发送已设置的聚焦搜索快捷键。请重新启动 Windsify 后重试。你仍可从菜单栏打开聚焦搜索。";
+"Windows key search" = "Windows 键搜索";
+"The Windows key opens your selected search app. Pro Win+S uses the same choice. Spotlight is the default. Raycast must be installed. Existing system and Raycast shortcuts stay unchanged." = "单按 Windows 键打开所选搜索应用，Pro 的 Win+S 使用同一选择。默认使用 Spotlight；使用 Raycast 前请先安装。系统和 Raycast 原有快捷键保持不变。";
+"Raycast could not open" = "无法打开 Raycast";
+"Raycast is not installed or its app identity could not be verified. Install Raycast from raycast.com, or choose Spotlight in Windsify settings, then try again." = "未安装 Raycast，或无法确认应用身份。请从 raycast.com 安装 Raycast，或在 Windsify 设置中选择 Spotlight，然后重试。";
+"Raycast could not be activated. Open Raycast from Applications and try again, or choose Spotlight in Windsify settings." = "无法激活 Raycast。请从“应用程序”打开 Raycast 后重试，或在 Windsify 设置中选择 Spotlight。";
