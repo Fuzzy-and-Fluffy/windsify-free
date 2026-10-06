@@ -79,11 +79,11 @@ final class ShortcutSupportTests: XCTestCase {
         let originalFlags = key.flags
         let stroke = KeyboardStroke(keyCode: MacKeyCode.c, modifiers: [.control])
         let context = CodeEditorPolicy.context(bundleIdentifier: "com.anthropic.claudefordesktop", focus: .unknown)
-        let decision = RuleDecision(ruleID: "editor.unknown-native", action: .passThrough)
+        let decision = KeyboardMappingEngine().evaluate(stroke, context: context)
         XCTAssertNil(model.intercept(type: .keyDown, event: key))
         XCTAssertTrue(model.isListening)
         model.observeLive(event: key, stroke: stroke, context: context, decision: decision, contextMilliseconds: 76)
-        XCTAssertEqual(model.result?.ruleID, "editor.unknown-native")
+        XCTAssertEqual(model.result?.ruleID, "generic.control-to-command")
         XCTAssertEqual(model.result?.outcome, "live-decision-captured")
         XCTAssertEqual(key.flags, originalFlags)
         XCTAssertEqual(key.getIntegerValueField(.eventSourceUserData), 0)
