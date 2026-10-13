@@ -436,3 +436,5 @@
 "Raycast could not open" = "Raycast could not open";
 "Raycast is not installed or its app identity could not be verified. Install Raycast from raycast.com, or choose Spotlight in Windsify settings, then try again." = "Raycast is not installed or its app identity could not be verified. Install Raycast from raycast.com, or choose Spotlight in Windsify settings, then try again.";
 "Raycast could not be activated. Open Raycast from Applications and try again, or choose Spotlight in Windsify settings." = "Raycast could not be activated. Open Raycast from Applications and try again, or choose Spotlight in Windsify settings.";
+
+"Continue / 继续 / 繼續" = "Continue / 继续 / 繼續";
