@@ -8,16 +8,38 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     case system
     case english = "en"
     case simplifiedChinese = "zh-Hans"
+    case traditionalChineseTaiwan = "zh-Hant-TW"
+    case traditionalChineseHongKong = "zh-Hant-HK"
+
+    // Include script-only Traditional Chinese without assigning it a region.
+    static let supportedLocalizations = ["en", "zh-Hans", "zh-Hant", "zh-Hant-TW", "zh-Hant-HK"]
 
     var id: String { rawValue }
 
     func resolvedIdentifier(preferredLanguages: [String] = Locale.preferredLanguages) -> String {
         switch self {
-        case .english: return "en"
-        case .simplifiedChinese: return "zh-Hans"
+        case .english, .simplifiedChinese, .traditionalChineseTaiwan, .traditionalChineseHongKong:
+            return rawValue
         case .system:
-            return preferredLanguages.first?.lowercased().hasPrefix("zh") == true ? "zh-Hans" : "en"
+            guard !preferredLanguages.isEmpty else { return "en" }
+            return Bundle.preferredLocalizations(
+                from: Self.supportedLocalizations, forPreferences: preferredLanguages
+            ).first ?? "en"
         }
+    }
+
+    func userGuideURL(preferredLanguages: [String] = Locale.preferredLanguages) -> URL {
+        let path: String
+        switch resolvedIdentifier(preferredLanguages: preferredLanguages) {
+        case "zh-Hans": path = "/zh/guides"
+        case "zh-Hant-TW": path = "/zh-tw/guides"
+        case "zh-Hant-HK": path = "/zh-hk/guides"
+        // A neutral Traditional UI keeps its identity; the Taiwan guide is a
+        // readable Traditional-script destination until a neutral guide exists.
+        case "zh-Hant": path = "/zh-tw/guides"
+        default: path = "/guides"
+        }
+        return URL(string: "https://windsify.com" + path)!
     }
 }
 
@@ -174,9 +196,9 @@ struct FirstLaunchLanguageChoice: View {
     var body: some View {
         if language.showsFirstLaunchChoice {
             VStack(alignment: .leading, spacing: 8) {
-                Text(verbatim: "Welcome to Windsify · 欢迎使用 Windsify")
+                Text(verbatim: "Welcome to Windsify · 欢迎使用 Windsify · 歡迎使用 Windsify")
                     .font(.headline)
-                Text(verbatim: "Choose your language below. You can change it anytime in Settings.\n请在下方选择语言，之后也可以随时在设置中更改。")
+                Text(verbatim: "Choose your language below. You can change it anytime in Settings.\n请在下方选择语言，之后也可以随时在设置中更改。\n請在下方選擇語言，之後可隨時在設定中更改。")
                     .font(.caption).fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -194,12 +216,14 @@ struct LanguageSettingsSection: View {
             )) {
                 Text("Follow System").tag(AppLanguage.system)
                 Text(verbatim: "简体中文").tag(AppLanguage.simplifiedChinese)
+                Text(verbatim: "繁體中文（台灣）").tag(AppLanguage.traditionalChineseTaiwan)
+                Text(verbatim: "繁體中文（香港）").tag(AppLanguage.traditionalChineseHongKong)
                 Text(verbatim: "English").tag(AppLanguage.english)
             }
             if language.showsFirstLaunchChoice {
-                Button("Continue / 继续") { language.dismissFirstLaunchChoice() }
+                Button("Continue / 继续 / 繼續") { language.dismissFirstLaunchChoice() }
             }
-            Link("Read the user guide", destination: URL(string: language.locale.identifier == "zh-Hans" ? "https://windsify.com/zh/guides" : "https://windsify.com/guides")!)
+            Link("Read the user guide", destination: language.selection.userGuideURL())
             Text("Changes the interface language only. Keyboard shortcuts and license settings stay the same.")
                 .font(.caption).foregroundStyle(.secondary)
         }

@@ -36,7 +36,7 @@ targets:
       path: FreeApp/Info.plist
       properties:
         CFBundleDevelopmentRegion: en
-        CFBundleLocalizations: [en, zh-Hans]
+        CFBundleLocalizations: [en, zh-Hans, zh-Hant, zh-Hant-TW, zh-Hant-HK]
         CFBundleDisplayName: Windsify Free
         CFBundleShortVersionString: "$(MARKETING_VERSION)"
         CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"

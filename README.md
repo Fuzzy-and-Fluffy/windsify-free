@@ -69,6 +69,16 @@ Dictation and Do Not Disturb action keys are recognized too; pressing a bare
 action key keeps its native behavior. Function-key delivery varies by keyboard
 and macOS, so Fn+Option+F4 remains the standard-function-key fallback.
 
+## Interface languages
+
+Settings > General > Language offers English, Simplified Chinese, Traditional
+Chinese (Taiwan), Traditional Chinese (Hong Kong), and Follow System. Follow
+System respects Apple's language-preference order, script and region, including
+a neutral Traditional Chinese resource for `zh-Hant`. Interface changes do not
+change keyboard settings. Existing choices persist, and upgrades never repeat
+the first-launch welcome. The settings guide link opens the matching regional
+website. See [localization rationale and glossary](docs/interface-localization.md).
+
 ## Build and test
 
 Requirements: macOS 15+, Xcode 26+, and
